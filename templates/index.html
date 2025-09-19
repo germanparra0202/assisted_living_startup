@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}CareConnect - Compassionate Assisted Living Services{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Compassionate Care for Your Loved Ones</h1>
+                <p class="lead mb-4">Experience the perfect blend of independence and support with our premium assisted living services. We provide personalized care in a warm, home-like environment.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{{ url_for('contact') }}" class="btn btn-primary btn-lg">Schedule a Tour</a>
+                    <a href="{{ url_for('services') }}" class="btn btn-outline-light btn-lg">Our Services</a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="position-relative">
+                    <div class="bg-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 300px; height: 300px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+                        <i class="fas fa-home text-primary" style="font-size: 8rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-5 fw-bold mb-3">Why Choose CareConnect?</h2>
+                <p class="lead text-muted">We're committed to providing exceptional care that enhances quality of life while maintaining dignity and independence.</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 text-center p-4">
+                    <div class="icon-box">
+                        <i class="fas fa-user-nurse"></i>
+                    </div>
+                    <h4 class="mb-3">24/7 Professional Care</h4>
+                    <p class="text-muted">Our certified caregivers provide round-the-clock support, ensuring your loved ones receive the attention they need, when they need it.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 text-center p-4">
+                    <div class="icon-box">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <h4 class="mb-3">Health Monitoring</h4>
+                    <p class="text-muted">Advanced health monitoring systems and regular wellness checks help maintain optimal health and catch potential issues early.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 text-center p-4">
+                    <div class="icon-box">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h4 class="mb-3">Social Activities</h4>
+                    <p class="text-muted">Engaging social programs and activities promote mental wellness and help residents build meaningful connections with others.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 text-center p-4">
+                    <div class="icon-box">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <h4 class="mb-3">Nutritious Meals</h4>
+                    <p class="text-muted">Chef-prepared, nutritionally balanced meals accommodate dietary restrictions and personal preferences for optimal health.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 text-center p-4">
+                    <div class="icon-box">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h4 class="mb-3">Safe Environment</h4>
+                    <p class="text-muted">Our facilities feature advanced security systems and safety measures designed specifically for senior living needs.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 text-center p-4">
+                    <div class="icon-box">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <h4 class="mb-3">Home-Like Comfort</h4>
+                    <p class="text-muted">Beautifully designed living spaces that feel like home, with personalized touches and comfortable amenities.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="h2 fw-bold text-primary mb-2">15+</div>
+                <p class="text-muted">Years of Experience</p>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="h2 fw-bold text-primary mb-2">500+</div>
+                <p class="text-muted">Happy Families</p>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="h2 fw-bold text-primary mb-2">98%</div>
+                <p class="text-muted">Satisfaction Rate</p>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="h2 fw-bold text-primary mb-2">24/7</div>
+                <p class="text-muted">Care Available</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-5 fw-bold mb-3">What Families Say</h2>
+                <p class="lead text-muted">Don't just take our word for it - hear from the families who trust us with their loved ones.</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card h-100 p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                    </div>
+                    <p class="mb-4">"CareConnect has been a blessing for our family. Mom is happier and healthier than she's been in years. The staff treats her like family."</p>
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">Sarah Johnson</h6>
+                            <small class="text-muted">Daughter of Resident</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card h-100 p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                    </div>
+                    <p class="mb-4">"The level of care and attention to detail is exceptional. Dad's medication management and health monitoring give us peace of mind."</p>
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">Michael Chen</h6>
+                            <small class="text-muted">Son of Resident</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card h-100 p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                    </div>
+                    <p class="mb-4">"The social activities and community atmosphere have made such a difference. Mom has made wonderful friends and stays active every day."</p>
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">Lisa Rodriguez</h6>
+                            <small class="text-muted">Daughter of Resident</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-4">Ready to Learn More?</h2>
+                <p class="lead mb-4">Schedule a personalized tour of our facilities and discover how CareConnect can provide the perfect home for your loved one.</p>
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <a href="{{ url_for('contact') }}" class="btn btn-primary btn-lg">Schedule a Tour</a>
+                    <a href="tel:555-123-4567" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-phone me-2"></i>Call Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
