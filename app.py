@@ -951,6 +951,85 @@ def analyze_cashflow():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/get_daily_occupancy', methods=['POST'])
+def get_daily_occupancy():
+    try:
+        # Get the requested date
+        requested_date = request.json.get('date')
+        
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if f.startswith('occupancy_')][0])
+        
+        if filepath.endswith('.csv'):
+            df = pd.read_csv(filepath)
+        else:
+            df = pd.read_excel(filepath)
+        
+        df['date'] = pd.to_datetime(df['date'])
+        
+        # Get all unique dates for calendar
+        if requested_date:
+            # Filter for specific date
+            date_obj = pd.to_datetime(requested_date)
+            daily_data = df[df['date'] == date_obj]
+            
+            # Generate patient IDs if not present
+            if 'patient_id' not in daily_data.columns:
+                daily_data['patient_id'] = range(1, len(daily_data) + 1)
+            
+            # Determine move-in/move-out status (simulated)
+            # In real scenario, this would come from admission/discharge dates
+            daily_data['status'] = np.random.choice(['Move-in', 'Current', 'Move-out'], len(daily_data), p=[0.1, 0.8, 0.1])
+            
+            move_ins = len(daily_data[daily_data['status'] == 'Move-in'])
+            move_outs = len(daily_data[daily_data['status'] == 'Move-out'])
+            net_occupancy = move_ins - move_outs
+            
+            patients_list = []
+            for _, row in daily_data.iterrows():
+                patient = {
+                    'patient_id': int(row['patient_id']) if 'patient_id' in row else 0,
+                    'age': int(row['age']) if 'age' in row else 0,
+                    'condition': str(row['condition']) if 'condition' in row else 'Unknown',
+                    'severity': int(row['condition_severity']) if 'condition_severity' in row else 0,
+                    'status': row['status'],
+                    'stay_duration': int(row['stay_duration']) if 'stay_duration' in row else 0,
+                    'occupancy_rate': float(row['occupancy_rate']) if 'occupancy_rate' in row else 0
+                }
+                patients_list.append(patient)
+            
+            return jsonify({
+                'success': True,
+                'date': requested_date,
+                'net_occupancy': net_occupancy,
+                'move_ins': move_ins,
+                'move_outs': move_outs,
+                'patients': patients_list
+            })
+        else:
+            # Return calendar data for the month
+            date_counts = df.groupby(df['date'].dt.date).agg({
+                'occupied_beds': 'mean',
+                'total_beds': 'first',
+                'occupancy_rate': 'mean'
+            }).reset_index()
+            
+            calendar_data = {}
+            for _, row in date_counts.iterrows():
+                date_str = row['date'].strftime('%Y-%m-%d')
+                calendar_data[date_str] = {
+                    'occupied_beds': int(row['occupied_beds']),
+                    'total_beds': int(row['total_beds']),
+                    'occupancy_rate': float(row['occupancy_rate'])
+                }
+            
+            return jsonify({
+                'success': True,
+                'calendar_data': calendar_data
+            })
+            
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 # CSV Export Routes
 @app.route('/export_occupancy_analysis', methods=['GET'])
 def export_occupancy_analysis():

@@ -462,6 +462,81 @@
                                 <div id="prediction-chart"></div>
                             </div>
                         </div>
+                        
+                        <!-- Daily Occupancy Calendar -->
+                        <div class="card mt-4" style="border-radius: 12px; border: 1px solid #e0e0e0;">
+                            <div class="card-body">
+                                <h5 class="mb-3"><i class="fas fa-calendar-check me-2"></i>Daily Occupancy Calendar</h5>
+                                <p class="text-muted small mb-4">View daily occupancy changes - click any date to see patient move-ins and move-outs</p>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-12 text-center">
+                                        <button class="btn btn-sm btn-outline-secondary me-2" id="prev-month-btn">
+                                            <i class="fas fa-chevron-left"></i> Previous
+                                        </button>
+                                        <span class="h5 mx-3" id="calendar-month-year"></span>
+                                        <button class="btn btn-sm btn-outline-secondary ms-2" id="next-month-btn">
+                                            Next <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div id="occupancy-calendar" style="overflow-x: auto;">
+                                    <!-- Calendar will be rendered here -->
+                                </div>
+                                
+                                <!-- Patient Details Modal Area -->
+                                <div id="patient-details-section" style="display: none; margin-top: 2rem;">
+                                    <h6 class="mb-3"><i class="fas fa-users me-2"></i>Patients for <span id="selected-date-display"></span></h6>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <div class="alert alert-info mb-0">
+                                                <strong>Net Occupancy:</strong> <span id="net-occupancy">0</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="alert alert-success mb-0">
+                                                <strong>Move-ins:</strong> <span id="move-ins-count">0</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="alert alert-warning mb-0">
+                                                <strong>Move-outs:</strong> <span id="move-outs-count">0</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Patient ID</th>
+                                                    <th>Age</th>
+                                                    <th>Condition</th>
+                                                    <th>Severity</th>
+                                                    <th>Status</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="patients-table-body">
+                                                <!-- Patients will be listed here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                
+                                <!-- Individual Patient Details Modal -->
+                                <div id="individual-patient-details" style="display: none; margin-top: 2rem; padding: 1.5rem; background: #f8f9fa; border-radius: 12px;">
+                                    <h6 class="mb-3"><i class="fas fa-user me-2"></i>Patient Details</h6>
+                                    <button class="btn btn-sm btn-outline-secondary mb-3" id="back-to-list-btn">
+                                        <i class="fas fa-arrow-left me-2"></i>Back to List
+                                    </button>
+                                    <div id="patient-detail-content">
+                                        <!-- Individual patient details will be shown here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 

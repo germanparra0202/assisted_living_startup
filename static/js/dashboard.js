@@ -731,6 +731,197 @@ function analyzeCashflowWithFilters(startDate = null, endDate = null) {
     });
 }
 
+// ========================
+// OCCUPANCY CALENDAR
+// ========================
+
+let currentCalendarMonth = new Date().getMonth();
+let currentCalendarYear = new Date().getFullYear();
+let calendarData = {};
+
+function renderOccupancyCalendar() {
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"];
+    
+    document.getElementById('calendar-month-year').textContent = 
+        `${monthNames[currentCalendarMonth]} ${currentCalendarYear}`;
+    
+    // Create calendar HTML
+    let calendarHTML = '<table class="table table-bordered text-center" style="font-size: 0.9rem;">';
+    calendarHTML += '<thead><tr>';
+    ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
+        calendarHTML += `<th style="padding: 0.5rem;">${day}</th>`;
+    });
+    calendarHTML += '</tr></thead><tbody>';
+    
+    // Get first day of month and number of days
+    const firstDay = new Date(currentCalendarYear, currentCalendarMonth, 1).getDay();
+    const daysInMonth = new Date(currentCalendarYear, currentCalendarMonth + 1, 0).getDate();
+    
+    let dayCount = 1;
+    for (let week = 0; week < 6; week++) {
+        calendarHTML += '<tr>';
+        for (let dow = 0; dow < 7; dow++) {
+            if ((week === 0 && dow < firstDay) || dayCount > daysInMonth) {
+                calendarHTML += '<td style="background: #f8f9fa;"></td>';
+            } else {
+                const dateStr = `${currentCalendarYear}-${String(currentCalendarMonth + 1).padStart(2, '0')}-${String(dayCount).padStart(2, '0')}`;
+                const hasData = calendarData[dateStr];
+                
+                let cellStyle = 'padding: 0.75rem; cursor: pointer; ';
+                let cellContent = `<div style="font-weight: bold;">${dayCount}</div>`;
+                
+                if (hasData) {
+                    const occupancyRate = hasData.occupancy_rate;
+                    if (occupancyRate >= 90) {
+                        cellStyle += 'background: #d4edda; color: #155724;';
+                    } else if (occupancyRate >= 70) {
+                        cellStyle += 'background: #fff3cd; color: #856404;';
+                    } else {
+                        cellStyle += 'background: #f8d7da; color: #721c24;';
+                    }
+                    cellContent += `<div style="font-size: 0.75rem;">${hasData.occupied_beds}/${hasData.total_beds}</div>`;
+                    cellContent += `<div style="font-size: 0.7rem;">${occupancyRate.toFixed(0)}%</div>`;
+                }
+                
+                calendarHTML += `<td style="${cellStyle}" onclick="loadDayDetails('${dateStr}')">${cellContent}</td>`;
+                dayCount++;
+            }
+        }
+        calendarHTML += '</tr>';
+        if (dayCount > daysInMonth) break;
+    }
+    
+    calendarHTML += '</tbody></table>';
+    document.getElementById('occupancy-calendar').innerHTML = calendarHTML;
+}
+
+function loadCalendarData() {
+    fetch('/get_daily_occupancy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            calendarData = data.calendar_data;
+            renderOccupancyCalendar();
+        }
+    })
+    .catch(error => console.error('Failed to load calendar data:', error));
+}
+
+function loadDayDetails(dateStr) {
+    fetch('/get_daily_occupancy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date: dateStr })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('selected-date-display').textContent = dateStr;
+            document.getElementById('net-occupancy').textContent = data.net_occupancy;
+            document.getElementById('move-ins-count').textContent = data.move_ins;
+            document.getElementById('move-outs-count').textContent = data.move_outs;
+            
+            let tableHTML = '';
+            data.patients.forEach(patient => {
+                let statusBadge = '';
+                if (patient.status === 'Move-in') {
+                    statusBadge = '<span class="badge bg-success">Move-in</span>';
+                } else if (patient.status === 'Move-out') {
+                    statusBadge = '<span class="badge bg-warning">Move-out</span>';
+                } else {
+                    statusBadge = '<span class="badge bg-secondary">Current</span>';
+                }
+                
+                tableHTML += `
+                    <tr>
+                        <td>${patient.patient_id}</td>
+                        <td>${patient.age}</td>
+                        <td>${patient.condition}</td>
+                        <td>${patient.severity}/5</td>
+                        <td>${statusBadge}</td>
+                        <td><button class="btn btn-sm btn-outline-primary" onclick='showPatientDetails(${JSON.stringify(patient)})'>View Details</button></td>
+                    </tr>
+                `;
+            });
+            
+            document.getElementById('patients-table-body').innerHTML = tableHTML;
+            document.getElementById('patient-details-section').style.display = 'block';
+            document.getElementById('individual-patient-details').style.display = 'none';
+        }
+    })
+    .catch(error => console.error('Failed to load day details:', error));
+}
+
+function showPatientDetails(patient) {
+    let detailsHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="text-muted">Patient Information</h6>
+                <table class="table table-sm">
+                    <tr><td><strong>Patient ID:</strong></td><td>${patient.patient_id}</td></tr>
+                    <tr><td><strong>Age:</strong></td><td>${patient.age} years</td></tr>
+                    <tr><td><strong>Condition:</strong></td><td>${patient.condition}</td></tr>
+                    <tr><td><strong>Condition Severity:</strong></td><td>${patient.severity}/5</td></tr>
+                    <tr><td><strong>Status:</strong></td><td>${patient.status}</td></tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h6 class="text-muted">Stay Information</h6>
+                <table class="table table-sm">
+                    <tr><td><strong>Stay Duration:</strong></td><td>${patient.stay_duration} days</td></tr>
+                    <tr><td><strong>Occupancy Rate:</strong></td><td>${patient.occupancy_rate.toFixed(1)}%</td></tr>
+                </table>
+                <div class="alert alert-light mt-3">
+                    <small><strong>Note:</strong> Additional patient information would be displayed here in a production system, including medical history, care plan, and contact information.</small>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('patient-detail-content').innerHTML = detailsHTML;
+    document.getElementById('patient-details-section').style.display = 'none';
+    document.getElementById('individual-patient-details').style.display = 'block';
+}
+
+// Calendar navigation
+document.getElementById('prev-month-btn').addEventListener('click', function() {
+    currentCalendarMonth--;
+    if (currentCalendarMonth < 0) {
+        currentCalendarMonth = 11;
+        currentCalendarYear--;
+    }
+    renderOccupancyCalendar();
+});
+
+document.getElementById('next-month-btn').addEventListener('click', function() {
+    currentCalendarMonth++;
+    if (currentCalendarMonth > 11) {
+        currentCalendarMonth = 0;
+        currentCalendarYear++;
+    }
+    renderOccupancyCalendar();
+});
+
+document.getElementById('back-to-list-btn').addEventListener('click', function() {
+    document.getElementById('individual-patient-details').style.display = 'none';
+    document.getElementById('patient-details-section').style.display = 'block';
+});
+
+// Load calendar when occupancy data is loaded
+const originalUploadOccupancyComplete = uploadOccupancyData;
+uploadOccupancyData = function(file, startDate = null, endDate = null) {
+    originalUploadOccupancyComplete(file, startDate, endDate);
+    // Load calendar data after a short delay to ensure data is processed
+    setTimeout(() => {
+        loadCalendarData();
+    }, 1000);
+};
+
 document.getElementById('analyze-cashflow-btn').addEventListener('click', function() {
     this.disabled = true;
     this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing Cash Flow...';
