@@ -827,6 +827,86 @@
                                 <i class="fas fa-calculator me-2"></i>Run Cash Flow Analysis
                             </button>
                         </div>
+                        
+                        <!-- Cash Flow Calendar -->
+                        <div class="card mt-4" style="border-radius: 12px; border: 1px solid #e0e0e0;">
+                            <div class="card-body">
+                                <h5 class="mb-3"><i class="fas fa-calendar-dollar me-2"></i>Cash Flow Calendar</h5>
+                                <p class="text-muted small mb-4">View expected vs actual cash flow - click any date to see payment details</p>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-12 text-center">
+                                        <button class="btn btn-sm btn-outline-secondary me-2" id="cf-prev-month-btn">
+                                            <i class="fas fa-chevron-left"></i> Previous
+                                        </button>
+                                        <span class="h5 mx-3" id="cf-calendar-month-year"></span>
+                                        <button class="btn btn-sm btn-outline-secondary ms-2" id="cf-next-month-btn">
+                                            Next <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <div class="d-flex justify-content-center gap-3 small">
+                                            <span><span class="badge" style="background: #d4edda; color: #155724;">●</span> Actual Positive</span>
+                                            <span><span class="badge" style="background: #f8d7da; color: #721c24;">●</span> Actual Negative</span>
+                                            <span><span class="badge" style="background: #d1ecf1; color: #0c5460;">●</span> Expected Positive</span>
+                                            <span><span class="badge" style="background: #fff3cd; color: #856404;">●</span> Expected Negative</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="cashflow-calendar" style="overflow-x: auto;">
+                                    <!-- Calendar will be rendered here -->
+                                </div>
+                                
+                                <!-- Cash Flow Details Section -->
+                                <div id="cashflow-details-section" style="display: none; margin-top: 2rem;">
+                                    <h6 class="mb-3"><i class="fas fa-money-bill-wave me-2"></i>Cash Flow for <span id="cf-selected-date-display"></span></h6>
+                                    <div class="row mb-3">
+                                        <div class="col-md-3">
+                                            <div class="alert alert-success mb-0">
+                                                <strong>Revenue:</strong> $<span id="cf-revenue">0</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="alert alert-warning mb-0">
+                                                <strong>Costs:</strong> $<span id="cf-costs">0</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="alert alert-info mb-0">
+                                                <strong>Net Cash Flow:</strong> $<span id="cf-net">0</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="alert alert-secondary mb-0">
+                                                <strong>Type:</strong> <span id="cf-type">-</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Type</th>
+                                                    <th>Payer Type</th>
+                                                    <th>Amount</th>
+                                                    <th>Service Date</th>
+                                                    <th>Expected Payment Date</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="cashflow-transactions-table">
+                                                <!-- Transactions will be listed here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

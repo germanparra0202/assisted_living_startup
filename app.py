@@ -11,6 +11,23 @@ import plotly.express as px
 import json
 
 app = Flask(__name__)
+
+# Helper function to convert numpy/pandas types to native Python types
+def convert_to_serializable(obj):
+    """Convert numpy/pandas types to native Python types for JSON serialization"""
+    if isinstance(obj, (np.integer, np.int64, np.int32)):
+        return int(obj)
+    elif isinstance(obj, (np.floating, np.float64, np.float32)):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, pd.Series):
+        return obj.tolist()
+    elif isinstance(obj, dict):
+        return {key: convert_to_serializable(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_to_serializable(item) for item in obj]
+    return obj
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 app.config['ALLOWED_EXTENSIONS'] = {'csv', 'xlsx', 'xls'}
@@ -160,17 +177,18 @@ def upload_occupancy():
                 min_date = df['date'].min().strftime('%Y-%m-%d')
                 max_date = df['date'].max().strftime('%Y-%m-%d')
             
-            return jsonify({
+            response_data = {
                 'success': True,
-                'occupancy_rate': round(occupancy_rate, 2),
+                'occupancy_rate': float(round(occupancy_rate, 2)),
                 'total_beds': int(total_beds),
-                'occupied_beds': avg_occupied_beds,
+                'occupied_beds': int(avg_occupied_beds),
                 'trend_chart': trend_chart,
                 'condition_chart': condition_chart,
-                'data_preview': df.head(10).to_dict('records'),
+                'data_preview': convert_to_serializable(df.head(10).to_dict('records')),
                 'min_date': min_date,
                 'max_date': max_date
-            })
+            }
+            return jsonify(response_data)
         
         return jsonify({'error': 'Invalid file type'}), 400
     
@@ -333,17 +351,18 @@ def upload_staffing():
                 min_date = df['date'].min().strftime('%Y-%m-%d')
                 max_date = df['date'].max().strftime('%Y-%m-%d')
             
-            return jsonify({
+            response_data = {
                 'success': True,
-                'total_cost': round(total_cost, 2),
-                'avg_hourly_rate': round(avg_hourly_rate, 2),
+                'total_cost': float(round(total_cost, 2)),
+                'avg_hourly_rate': float(round(avg_hourly_rate, 2)),
                 'total_staff': int(total_staff),
                 'cost_trend_chart': cost_trend_chart,
                 'care_level_chart': care_level_chart,
-                'data_preview': df.head(10).to_dict('records'),
+                'data_preview': convert_to_serializable(df.head(10).to_dict('records')),
                 'min_date': min_date,
                 'max_date': max_date
-            })
+            }
+            return jsonify(response_data)
         
         return jsonify({'error': 'Invalid file type'}), 400
     
@@ -503,16 +522,17 @@ def upload_revenue():
                 min_date = df['date'].min().strftime('%Y-%m-%d')
                 max_date = df['date'].max().strftime('%Y-%m-%d')
             
-            return jsonify({
+            response_data = {
                 'success': True,
-                'total_revenue': round(total_revenue, 2),
-                'avg_revenue': round(avg_revenue, 2),
+                'total_revenue': float(round(total_revenue, 2)),
+                'avg_revenue': float(round(avg_revenue, 2)),
                 'payer_chart': payer_chart,
                 'revenue_trend_chart': revenue_trend_chart,
-                'data_preview': df.head(10).to_dict('records'),
+                'data_preview': convert_to_serializable(df.head(10).to_dict('records')),
                 'min_date': min_date,
                 'max_date': max_date
-            })
+            }
+            return jsonify(response_data)
         
         return jsonify({'error': 'Invalid file type'}), 400
     
@@ -654,13 +674,14 @@ def analyze_occupancy_stats():
         else:
             distribution_chart = None
         
-        return jsonify({
-            'success': True,
-            'statistics': stats_summary,
-            'correlation_chart': correlation_chart,
-            'distribution_chart': distribution_chart,
-            'total_records': len(df)
-        })
+            response_data = {
+                'success': True,
+                'statistics': convert_to_serializable(stats_summary),
+                'correlation_chart': correlation_chart,
+                'distribution_chart': distribution_chart,
+                'total_records': int(len(df))
+            }
+            return jsonify(response_data)
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -726,14 +747,15 @@ def analyze_staffing_stats():
         else:
             trend_info = {}
         
-        return jsonify({
+        response_data = {
             'success': True,
-            'statistics': stats_summary,
-            'variance_by_level': variance_by_level,
+            'statistics': convert_to_serializable(stats_summary),
+            'variance_by_level': convert_to_serializable(variance_by_level),
             'variance_chart': variance_chart,
-            'trend_analysis': trend_info,
-            'total_records': len(df)
-        })
+            'trend_analysis': convert_to_serializable(trend_info),
+            'total_records': int(len(df))
+        }
+        return jsonify(response_data)
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -799,14 +821,15 @@ def analyze_revenue_stats():
         else:
             trend_info = {}
         
-        return jsonify({
+        response_data = {
             'success': True,
-            'statistics': stats_summary,
-            'payer_statistics': payer_stats,
+            'statistics': convert_to_serializable(stats_summary),
+            'payer_statistics': convert_to_serializable(payer_stats),
             'distribution_chart': distribution_chart,
-            'trend_analysis': trend_info,
-            'total_records': len(df)
-        })
+            'trend_analysis': convert_to_serializable(trend_info),
+            'total_records': int(len(df))
+        }
+        return jsonify(response_data)
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -936,17 +959,18 @@ def analyze_cashflow():
         )
         summary_chart = json.loads(fig3.to_json())
         
-        return jsonify({
+        response_data = {
             'success': True,
-            'net_cashflow': round(net_cashflow, 2),
-            'burn_rate': round(avg_daily_burn, 2),
-            'profit_margin': round(profit_margin, 2),
-            'total_revenue': round(total_revenue, 2),
-            'total_costs': round(total_costs, 2),
+            'net_cashflow': float(round(net_cashflow, 2)),
+            'burn_rate': float(round(avg_daily_burn, 2)),
+            'profit_margin': float(round(profit_margin, 2)),
+            'total_revenue': float(round(total_revenue, 2)),
+            'total_costs': float(round(total_costs, 2)),
             'cashflow_trend': cashflow_trend,
             'cumulative_chart': cumulative_chart,
             'summary_chart': summary_chart
-        })
+        }
+        return jsonify(response_data)
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -987,24 +1011,25 @@ def get_daily_occupancy():
             patients_list = []
             for _, row in daily_data.iterrows():
                 patient = {
-                    'patient_id': int(row['patient_id']) if 'patient_id' in row else 0,
-                    'age': int(row['age']) if 'age' in row else 0,
-                    'condition': str(row['condition']) if 'condition' in row else 'Unknown',
-                    'severity': int(row['condition_severity']) if 'condition_severity' in row else 0,
-                    'status': row['status'],
-                    'stay_duration': int(row['stay_duration']) if 'stay_duration' in row else 0,
-                    'occupancy_rate': float(row['occupancy_rate']) if 'occupancy_rate' in row else 0
+                    'patient_id': int(row.get('patient_id', 0)),
+                    'age': int(row.get('age', 0)),
+                    'condition': str(row.get('condition', 'Unknown')),
+                    'severity': int(row.get('condition_severity', 0)),
+                    'status': str(row.get('status', 'Current')),
+                    'stay_duration': int(row.get('stay_duration', 0)),
+                    'occupancy_rate': float(row.get('occupancy_rate', 0))
                 }
                 patients_list.append(patient)
             
-            return jsonify({
+            response_data = {
                 'success': True,
                 'date': requested_date,
-                'net_occupancy': net_occupancy,
-                'move_ins': move_ins,
-                'move_outs': move_outs,
-                'patients': patients_list
-            })
+                'net_occupancy': int(net_occupancy),
+                'move_ins': int(move_ins),
+                'move_outs': int(move_outs),
+                'patients': convert_to_serializable(patients_list)
+            }
+            return jsonify(response_data)
         else:
             # Return calendar data for the month
             date_counts = df.groupby(df['date'].dt.date).agg({
@@ -1015,17 +1040,156 @@ def get_daily_occupancy():
             
             calendar_data = {}
             for _, row in date_counts.iterrows():
-                date_str = row['date'].strftime('%Y-%m-%d')
+                date_str = str(row['date'])
                 calendar_data[date_str] = {
                     'occupied_beds': int(row['occupied_beds']),
                     'total_beds': int(row['total_beds']),
                     'occupancy_rate': float(row['occupancy_rate'])
                 }
             
-            return jsonify({
+            response_data = {
                 'success': True,
-                'calendar_data': calendar_data
-            })
+                'calendar_data': convert_to_serializable(calendar_data)
+            }
+            return jsonify(response_data)
+            
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/get_cashflow_by_date', methods=['POST'])
+def get_cashflow_by_date():
+    try:
+        requested_date = request.json.get('date')
+        
+        # Find revenue and staffing files
+        revenue_files = [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if f.startswith('revenue_')]
+        staffing_files = [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if f.startswith('staffing_')]
+        
+        if not revenue_files or not staffing_files:
+            return jsonify({'error': 'Please upload both Revenue and Staffing data first'}), 400
+        
+        # Read the data
+        revenue_filepath = os.path.join(app.config['UPLOAD_FOLDER'], revenue_files[0])
+        staffing_filepath = os.path.join(app.config['UPLOAD_FOLDER'], staffing_files[0])
+        
+        if revenue_filepath.endswith('.csv'):
+            revenue_df = pd.read_csv(revenue_filepath)
+        else:
+            revenue_df = pd.read_excel(revenue_filepath)
+            
+        if staffing_filepath.endswith('.csv'):
+            staffing_df = pd.read_csv(staffing_filepath)
+        else:
+            staffing_df = pd.read_excel(staffing_filepath)
+        
+        # Process dates
+        revenue_df['date'] = pd.to_datetime(revenue_df['date'])
+        staffing_df['date'] = pd.to_datetime(staffing_df['date'])
+        
+        # Calculate expected payment dates based on payer type
+        # Private Pay = same day, Medicare = service date + delay, Insurance = service date + delay
+        revenue_df['expected_payment_date'] = revenue_df.apply(
+            lambda row: row['date'] if row.get('payer_type') == 'Private Pay' 
+            else row['date'] + pd.Timedelta(days=int(row.get('payment_delay_days', 30))),
+            axis=1
+        )
+        
+        if requested_date:
+            # Get specific date details
+            target_date = pd.to_datetime(requested_date)
+            
+            # Find revenue received on this date (expected payment date)
+            revenue_received = revenue_df[revenue_df['expected_payment_date'].dt.date == target_date.date()]
+            
+            # Find costs for this date
+            costs_on_date = staffing_df[staffing_df['date'].dt.date == target_date.date()]
+            
+            # Calculate totals
+            total_revenue = float(revenue_received['amount'].sum() if len(revenue_received) > 0 else 0)
+            total_costs = float(costs_on_date['total_cost'].sum() if len(costs_on_date) > 0 else 0)
+            net_cashflow = total_revenue - total_costs
+            
+            # Determine if this is actual (historical) or expected (future)
+            today = pd.Timestamp.now().normalize()
+            is_actual = target_date.date() <= today.date()
+            cf_type = 'Actual' if is_actual else 'Expected'
+            
+            # Build transactions list
+            transactions = []
+            
+            # Add revenue transactions
+            for _, row in revenue_received.iterrows():
+                service_date = row['date'].strftime('%Y-%m-%d')
+                expected_date = row['expected_payment_date'].strftime('%Y-%m-%d')
+                
+                transactions.append({
+                    'type': 'Revenue',
+                    'payer_type': str(row.get('payer_type', 'Unknown')),
+                    'amount': float(row['amount']),
+                    'service_date': service_date,
+                    'expected_payment_date': expected_date,
+                    'status': 'Received' if is_actual else 'Pending',
+                    'delay_days': int(row.get('payment_delay_days', 0))
+                })
+            
+            # Add cost transactions
+            for _, row in costs_on_date.iterrows():
+                transactions.append({
+                    'type': 'Cost',
+                    'payer_type': 'Staffing',
+                    'amount': float(row['total_cost']),
+                    'service_date': row['date'].strftime('%Y-%m-%d'),
+                    'expected_payment_date': row['date'].strftime('%Y-%m-%d'),
+                    'status': 'Paid' if is_actual else 'Due',
+                    'delay_days': 0
+                })
+            
+            response_data = {
+                'success': True,
+                'date': requested_date,
+                'revenue': float(round(total_revenue, 2)),
+                'costs': float(round(total_costs, 2)),
+                'net_cashflow': float(round(net_cashflow, 2)),
+                'type': cf_type,
+                'transactions': convert_to_serializable(transactions)
+            }
+            return jsonify(response_data)
+        else:
+            # Return calendar data for the month
+            # Calculate daily cash flow considering expected payment dates
+            today = pd.Timestamp.now().normalize()
+            
+            # Group revenue by expected payment date
+            daily_revenue = revenue_df.groupby(revenue_df['expected_payment_date'].dt.date)['amount'].sum().reset_index()
+            daily_revenue.columns = ['date', 'revenue']
+            
+            # Group costs by date
+            daily_costs = staffing_df.groupby(staffing_df['date'].dt.date)['total_cost'].sum().reset_index()
+            daily_costs.columns = ['date', 'costs']
+            
+            # Merge
+            calendar_df = pd.merge(daily_revenue, daily_costs, on='date', how='outer').fillna(0)
+            calendar_df['net_cashflow'] = calendar_df['revenue'] - calendar_df['costs']
+            
+            # Build calendar data
+            calendar_data = {}
+            for _, row in calendar_df.iterrows():
+                date_str = str(row['date'])
+                is_actual = pd.to_datetime(row['date']).date() <= today.date()
+                
+                calendar_data[date_str] = {
+                    'revenue': float(row['revenue']),
+                    'costs': float(row['costs']),
+                    'net_cashflow': float(row['net_cashflow']),
+                    'type': 'actual' if is_actual else 'expected'
+                }
+            
+            response_data = {
+                'success': True,
+                'calendar_data': convert_to_serializable(calendar_data),
+                'today': today.strftime('%Y-%m-%d')
+            }
+            return jsonify(response_data)
             
     except Exception as e:
         return jsonify({'error': str(e)}), 500

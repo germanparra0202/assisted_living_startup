@@ -47,6 +47,15 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => console.error('Failed to load revenue sample data:', error));
     
+    // Auto-load cash flow analysis after a delay to ensure revenue and staffing data are loaded
+    setTimeout(() => {
+        analyzeCashflowWithFilters();
+        // Also load the cash flow calendar
+        setTimeout(() => {
+            loadCFCalendarData();
+        }, 1000);
+    }, 2000);
+    
     // Set up date filter listeners
     setupDateFilters();
 });
@@ -921,6 +930,180 @@ uploadOccupancyData = function(file, startDate = null, endDate = null) {
         loadCalendarData();
     }, 1000);
 };
+
+// ========================
+// CASH FLOW CALENDAR
+// ========================
+
+let currentCFCalendarMonth = new Date().getMonth();
+let currentCFCalendarYear = new Date().getFullYear();
+let cfCalendarData = {};
+let cfToday = '';
+
+function renderCashFlowCalendar() {
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"];
+    
+    document.getElementById('cf-calendar-month-year').textContent = 
+        `${monthNames[currentCFCalendarMonth]} ${currentCFCalendarYear}`;
+    
+    // Create calendar HTML
+    let calendarHTML = '<table class="table table-bordered text-center" style="font-size: 0.9rem;">';
+    calendarHTML += '<thead><tr>';
+    ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
+        calendarHTML += `<th style="padding: 0.5rem;">${day}</th>`;
+    });
+    calendarHTML += '</tr></thead><tbody>';
+    
+    // Get first day of month and number of days
+    const firstDay = new Date(currentCFCalendarYear, currentCFCalendarMonth, 1).getDay();
+    const daysInMonth = new Date(currentCFCalendarYear, currentCFCalendarMonth + 1, 0).getDate();
+    
+    let dayCount = 1;
+    for (let week = 0; week < 6; week++) {
+        calendarHTML += '<tr>';
+        for (let dow = 0; dow < 7; dow++) {
+            if ((week === 0 && dow < firstDay) || dayCount > daysInMonth) {
+                calendarHTML += '<td style="background: #f8f9fa;"></td>';
+            } else {
+                const dateStr = `${currentCFCalendarYear}-${String(currentCFCalendarMonth + 1).padStart(2, '0')}-${String(dayCount).padStart(2, '0')}`;
+                const hasData = cfCalendarData[dateStr];
+                
+                let cellStyle = 'padding: 0.75rem; cursor: pointer; ';
+                let cellContent = `<div style="font-weight: bold;">${dayCount}</div>`;
+                
+                if (hasData) {
+                    const netCF = hasData.net_cashflow;
+                    const isActual = hasData.type === 'actual';
+                    
+                    // Color coding: actual positive (green), actual negative (red), 
+                    // expected positive (light blue), expected negative (yellow)
+                    if (isActual) {
+                        if (netCF > 0) {
+                            cellStyle += 'background: #d4edda; color: #155724;';
+                        } else {
+                            cellStyle += 'background: #f8d7da; color: #721c24;';
+                        }
+                    } else {
+                        if (netCF > 0) {
+                            cellStyle += 'background: #d1ecf1; color: #0c5460;';
+                        } else {
+                            cellStyle += 'background: #fff3cd; color: #856404;';
+                        }
+                    }
+                    
+                    cellContent += `<div style="font-size: 0.7rem;">${isActual ? 'Actual' : 'Expected'}</div>`;
+                    cellContent += `<div style="font-size: 0.75rem; font-weight: bold;">$${Math.round(netCF).toLocaleString()}</div>`;
+                }
+                
+                calendarHTML += `<td style="${cellStyle}" onclick="loadCFDayDetails('${dateStr}')">${cellContent}</td>`;
+                dayCount++;
+            }
+        }
+        calendarHTML += '</tr>';
+        if (dayCount > daysInMonth) break;
+    }
+    
+    calendarHTML += '</tbody></table>';
+    document.getElementById('cashflow-calendar').innerHTML = calendarHTML;
+}
+
+function loadCFCalendarData() {
+    fetch('/get_cashflow_by_date', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            cfCalendarData = data.calendar_data;
+            cfToday = data.today;
+            renderCashFlowCalendar();
+        }
+    })
+    .catch(error => console.error('Failed to load cash flow calendar data:', error));
+}
+
+function loadCFDayDetails(dateStr) {
+    fetch('/get_cashflow_by_date', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date: dateStr })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('cf-selected-date-display').textContent = dateStr;
+            document.getElementById('cf-revenue').textContent = data.revenue.toLocaleString();
+            document.getElementById('cf-costs').textContent = data.costs.toLocaleString();
+            document.getElementById('cf-net').textContent = data.net_cashflow.toLocaleString();
+            document.getElementById('cf-type').textContent = data.type;
+            
+            let tableHTML = '';
+            data.transactions.forEach(txn => {
+                let statusBadge = '';
+                if (txn.status === 'Received') {
+                    statusBadge = '<span class="badge bg-success">Received</span>';
+                } else if (txn.status === 'Pending') {
+                    statusBadge = '<span class="badge bg-warning">Pending</span>';
+                } else if (txn.status === 'Paid') {
+                    statusBadge = '<span class="badge bg-secondary">Paid</span>';
+                } else {
+                    statusBadge = '<span class="badge bg-info">Due</span>';
+                }
+                
+                const typeBadge = txn.type === 'Revenue' 
+                    ? '<span class="badge bg-success">Revenue</span>' 
+                    : '<span class="badge bg-danger">Cost</span>';
+                
+                tableHTML += `
+                    <tr>
+                        <td>${typeBadge}</td>
+                        <td>${txn.payer_type}</td>
+                        <td>$${txn.amount.toLocaleString()}</td>
+                        <td>${txn.service_date}</td>
+                        <td>${txn.expected_payment_date}${txn.delay_days > 0 ? ` (+${txn.delay_days}d)` : ''}</td>
+                        <td>${statusBadge}</td>
+                    </tr>
+                `;
+            });
+            
+            document.getElementById('cashflow-transactions-table').innerHTML = tableHTML;
+            document.getElementById('cashflow-details-section').style.display = 'block';
+        }
+    })
+    .catch(error => console.error('Failed to load cash flow day details:', error));
+}
+
+// Cash flow calendar navigation
+document.getElementById('cf-prev-month-btn').addEventListener('click', function() {
+    currentCFCalendarMonth--;
+    if (currentCFCalendarMonth < 0) {
+        currentCFCalendarMonth = 11;
+        currentCFCalendarYear--;
+    }
+    renderCashFlowCalendar();
+});
+
+document.getElementById('cf-next-month-btn').addEventListener('click', function() {
+    currentCFCalendarMonth++;
+    if (currentCFCalendarMonth > 11) {
+        currentCFCalendarMonth = 0;
+        currentCFCalendarYear++;
+    }
+    renderCashFlowCalendar();
+});
+
+// Load calendar when cash flow tab is clicked
+document.getElementById('cashflow-tab').addEventListener('click', function() {
+    // Small delay to ensure tab is loaded
+    setTimeout(() => {
+        if (Object.keys(cfCalendarData).length === 0) {
+            loadCFCalendarData();
+        }
+    }, 500);
+});
 
 document.getElementById('analyze-cashflow-btn').addEventListener('click', function() {
     this.disabled = true;
