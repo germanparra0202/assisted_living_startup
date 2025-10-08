@@ -1,0 +1,549 @@
+{% extends "base.html" %}
+
+{% block title %}CareConnect Analytics - Data-Driven Insights for Assisted Living{% endblock %}
+
+{% block content %}
+<style>
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        color: white;
+        padding: 8rem 0 6rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.05) 0%, transparent 50%);
+        pointer-events: none;
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 1;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    .hero-badge {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        margin-bottom: 2rem;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+    }
+    
+    .hero-title {
+        font-size: 4rem;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.02em;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.5rem;
+        font-weight: 400;
+        margin-bottom: 3rem;
+        opacity: 0.9;
+        line-height: 1.6;
+    }
+    
+    .hero-cta {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .btn-primary-hero {
+        background: white;
+        color: #1a1a1a;
+        padding: 1rem 2.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-primary-hero:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        color: #1a1a1a;
+    }
+    
+    .btn-secondary-hero {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        padding: 1rem 2.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        text-decoration: none;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-secondary-hero:hover {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+    
+    /* Trusted By Section */
+    .trusted-section {
+        padding: 3rem 0;
+        background: #f8f9fa;
+        text-align: center;
+    }
+    
+    .trusted-text {
+        color: #6c757d;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
+    }
+    
+    /* Features Section */
+    .features-section {
+        padding: 6rem 0;
+        background: white;
+    }
+    
+    .section-badge {
+        display: inline-block;
+        background: #f8f9fa;
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .section-title {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 3rem;
+        color: #1a1a1a;
+        text-align: center;
+    }
+    
+    .feature-card {
+        background: #f8f9fa;
+        border-radius: 20px;
+        padding: 2.5rem;
+        height: 100%;
+        transition: all 0.3s ease;
+        border: 1px solid #e9ecef;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .feature-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #1a1a1a;
+    }
+    
+    .feature-description {
+        color: #6c757d;
+        line-height: 1.7;
+    }
+    
+    /* How It Works Section */
+    .how-it-works {
+        padding: 6rem 0;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        color: white;
+    }
+    
+    .step-card {
+        text-align: center;
+        padding: 2rem;
+    }
+    
+    .step-number {
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0 auto 1.5rem;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .step-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .step-description {
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.6;
+    }
+    
+    /* Benefits Section */
+    .benefits-section {
+        padding: 6rem 0;
+        background: white;
+    }
+    
+    .benefit-item {
+        display: flex;
+        align-items: start;
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .benefit-item:hover {
+        background: #e9ecef;
+    }
+    
+    .benefit-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        margin-right: 1.5rem;
+        flex-shrink: 0;
+    }
+    
+    .benefit-content h5 {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: #1a1a1a;
+    }
+    
+    .benefit-content p {
+        margin: 0;
+        color: #6c757d;
+    }
+    
+    /* CTA Section */
+    .cta-section {
+        padding: 6rem 0;
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        color: white;
+        text-align: center;
+    }
+    
+    .cta-title {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+    }
+    
+    .cta-subtitle {
+        font-size: 1.3rem;
+        margin-bottom: 2.5rem;
+        opacity: 0.9;
+    }
+    
+    /* Footer */
+    .footer {
+        background: #1a1a1a;
+        color: rgba(255, 255, 255, 0.6);
+        padding: 3rem 0;
+        text-align: center;
+    }
+    
+    .footer-links {
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0;
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+    
+    .footer-links a {
+        color: rgba(255, 255, 255, 0.6);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    
+    .footer-links a:hover {
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2rem;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+        }
+        
+        .cta-title {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-chart-line me-2"></i>Powered by AI & Advanced Analytics
+            </div>
+            <h1 class="hero-title">Predictable Growth.<br>From Complex Care Data.</h1>
+            <p class="hero-subtitle">CareConnect transforms your assisted living data into actionable insights that drive occupancy, optimize staffing, and maximize revenue.</p>
+            <div class="hero-cta">
+                <a href="/dashboard" class="btn-primary-hero">
+                    <i class="fas fa-rocket me-2"></i>Launch Dashboard
+                </a>
+                <a href="#how-it-works" class="btn-secondary-hero">
+                    Learn More
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Trusted By Section -->
+<section class="trusted-section">
+    <div class="container">
+        <p class="trusted-text">Trusted by forward-thinking assisted living facilities</p>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-badge">Our Platform</span>
+            <h2 class="section-title">Three Powerful Analytics Modules</h2>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bed"></i>
+                    </div>
+                    <h3 class="feature-title">Occupancy Intelligence</h3>
+                    <p class="feature-description">Track occupancy trends, analyze patient demographics, and predict life expectancy using machine learning models. Make data-driven decisions about capacity planning and care allocation.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="feature-title">Staffing Optimization</h3>
+                    <p class="feature-description">Forecast staffing needs, analyze cost trends by care level, and optimize resource allocation. Reduce costs while maintaining quality care with statistical forecasting.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <h3 class="feature-title">Revenue Analytics</h3>
+                    <p class="feature-description">Understand payer mix distribution, forecast cash flow patterns, and identify revenue opportunities. Track payment delays and optimize collection strategies.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works" id="how-it-works">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-badge" style="background: rgba(255,255,255,0.1); color: white;">Simple Process</span>
+            <h2 class="section-title" style="color: white;">From Data to Insights in Minutes</h2>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h4 class="step-title">Upload Your Data</h4>
+                    <p class="step-description">Import CSV or Excel files with occupancy, staffing, or revenue data. Download our templates for easy formatting.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h4 class="step-title">Instant Visualization</h4>
+                    <p class="step-description">See your data come alive with interactive charts and real-time metrics. All visualizations update automatically.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h4 class="step-title">Generate Insights</h4>
+                    <p class="step-description">Run AI predictions or statistical analysis with one click. Get forecasts, trends, and actionable recommendations.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h4 class="step-title">Export Results</h4>
+                    <p class="step-description">Download complete analysis reports as CSV files for further processing or presentation to stakeholders.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Benefits Section -->
+<section class="benefits-section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-badge">Why CareConnect</span>
+            <h2 class="section-title">Built for Modern Healthcare Analytics</h2>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="benefit-content">
+                        <h5>AI-Powered Predictions</h5>
+                        <p>Leverage machine learning for life expectancy predictions, cost forecasting, and revenue projections.</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="benefit-content">
+                        <h5>Statistical Analysis</h5>
+                        <p>Access descriptive statistics, correlation analysis, variance testing, and trend significance testing.</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="benefit-content">
+                        <h5>Colorblind-Safe Design</h5>
+                        <p>All visualizations use scientifically-proven colorblind-safe palettes for universal accessibility.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="benefit-content">
+                        <h5>Real-Time Processing</h5>
+                        <p>Upload data and see results instantly. No waiting, no batch processing, no delays.</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <div class="benefit-content">
+                        <h5>Export Everything</h5>
+                        <p>Download analysis results, forecasts, and raw data with predictions for external use.</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="benefit-content">
+                        <h5>Fully Responsive</h5>
+                        <p>Access your analytics dashboard from any device - desktop, tablet, or mobile.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <h2 class="cta-title">Ready to Transform Your Data?</h2>
+        <p class="cta-subtitle">Join facilities using CareConnect to make smarter, data-driven decisions.</p>
+        <div class="hero-cta">
+            <a href="/dashboard" class="btn-primary-hero">
+                <i class="fas fa-chart-line me-2"></i>Start Analyzing Now
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2025 CareConnect Analytics. All rights reserved.</p>
+        <ul class="footer-links">
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+        </ul>
+    </div>
+</footer>
+
+{% endblock %}
