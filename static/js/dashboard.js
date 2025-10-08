@@ -105,13 +105,19 @@ function uploadOccupancyData(file) {
         document.getElementById('total-beds').textContent = data.total_beds;
         document.getElementById('occupied-beds').textContent = data.occupied_beds;
         
-        // Render charts
+                // Render charts with responsive config
         if (data.trend_chart) {
-            Plotly.newPlot('occupancy-trend-chart', data.trend_chart.data, data.trend_chart.layout, {responsive: true});
+            Plotly.newPlot('occupancy-trend-chart', data.trend_chart.data, data.trend_chart.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
         }
         
         if (data.condition_chart) {
-            Plotly.newPlot('condition-chart', data.condition_chart.data, data.condition_chart.layout, {responsive: true});
+            Plotly.newPlot('condition-chart', data.condition_chart.data, data.condition_chart.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
         }
         
         document.getElementById('occupancy-results').style.display = 'block';
@@ -179,7 +185,10 @@ document.getElementById('analyze-occupancy-stats-btn').addEventListener('click',
             chartDiv.id = 'correlation-chart-stats';
             chartContainer.appendChild(chartDiv);
             document.getElementById('occupancy-stats-results').appendChild(chartContainer);
-            Plotly.newPlot('correlation-chart-stats', data.correlation_chart.data, data.correlation_chart.layout, {responsive: true});
+            Plotly.newPlot('correlation-chart-stats', data.correlation_chart.data, data.correlation_chart.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
         }
         
         // Render distribution chart
@@ -190,7 +199,10 @@ document.getElementById('analyze-occupancy-stats-btn').addEventListener('click',
             chartDiv.id = 'distribution-chart-stats';
             chartContainer.appendChild(chartDiv);
             document.getElementById('occupancy-stats-results').appendChild(chartContainer);
-            Plotly.newPlot('distribution-chart-stats', data.distribution_chart.data, data.distribution_chart.layout, {responsive: true});
+            Plotly.newPlot('distribution-chart-stats', data.distribution_chart.data, data.distribution_chart.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
         }
         
         document.getElementById('occupancy-stats-results').style.display = 'block';
@@ -223,7 +235,10 @@ document.getElementById('predict-occupancy-btn').addEventListener('click', funct
         document.getElementById('avg-life-expectancy').textContent = data.avg_life_expectancy;
         
         if (data.prediction_chart) {
-            Plotly.newPlot('prediction-chart', data.prediction_chart.data, data.prediction_chart.layout, {responsive: true});
+            Plotly.newPlot('prediction-chart', data.prediction_chart.data, data.prediction_chart.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
         }
         
         document.getElementById('occupancy-prediction-results').style.display = 'block';
@@ -295,13 +310,19 @@ function uploadStaffingData(file) {
         document.getElementById('avg-hourly-rate').textContent = formatCurrency(data.avg_hourly_rate);
         document.getElementById('total-staff').textContent = data.total_staff;
         
-        // Render charts
+        // Render charts with responsive config
         if (data.cost_trend_chart) {
-            Plotly.newPlot('cost-trend-chart', data.cost_trend_chart.data, data.cost_trend_chart.layout, {responsive: true});
+            Plotly.newPlot('cost-trend-chart', data.cost_trend_chart.data, data.cost_trend_chart.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
         }
         
         if (data.care_level_chart) {
-            Plotly.newPlot('care-level-chart', data.care_level_chart.data, data.care_level_chart.layout, {responsive: true});
+            Plotly.newPlot('care-level-chart', data.care_level_chart.data, data.care_level_chart.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
         }
         
         document.getElementById('staffing-results').style.display = 'block';
@@ -377,7 +398,10 @@ document.getElementById('analyze-staffing-stats-btn').addEventListener('click', 
             chartDiv.id = 'variance-chart-stats';
             chartContainer.appendChild(chartDiv);
             document.getElementById('staffing-stats-results').appendChild(chartContainer);
-            Plotly.newPlot('variance-chart-stats', data.variance_chart.data, data.variance_chart.layout, {responsive: true});
+            Plotly.newPlot('variance-chart-stats', data.variance_chart.data, data.variance_chart.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
         }
         
         document.getElementById('staffing-stats-results').style.display = 'block';
@@ -411,7 +435,10 @@ document.getElementById('predict-staffing-btn').addEventListener('click', functi
         document.getElementById('six-month-total').textContent = formatCurrency(data.six_month_total);
         
         if (data.forecast_chart) {
-            Plotly.newPlot('staffing-forecast-chart', data.forecast_chart.data, data.forecast_chart.layout, {responsive: true});
+            Plotly.newPlot('staffing-forecast-chart', data.forecast_chart.data, data.forecast_chart.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
         }
         
         document.getElementById('staffing-prediction-results').style.display = 'block';
@@ -482,13 +509,19 @@ function uploadRevenueData(file) {
         document.getElementById('total-revenue').textContent = formatCurrency(data.total_revenue);
         document.getElementById('avg-revenue').textContent = formatCurrency(data.avg_revenue);
         
-        // Render charts
+        // Render charts with responsive config
         if (data.payer_chart) {
-            Plotly.newPlot('payer-chart', data.payer_chart.data, data.payer_chart.layout, {responsive: true});
+            Plotly.newPlot('payer-chart', data.payer_chart.data, data.payer_chart.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
         }
         
         if (data.revenue_trend_chart) {
-            Plotly.newPlot('revenue-trend-chart', data.revenue_trend_chart.data, data.revenue_trend_chart.layout, {responsive: true});
+            Plotly.newPlot('revenue-trend-chart', data.revenue_trend_chart.data, data.revenue_trend_chart.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
         }
         
         document.getElementById('revenue-results').style.display = 'block';
@@ -573,7 +606,10 @@ document.getElementById('analyze-revenue-stats-btn').addEventListener('click', f
             chartDiv.id = 'revenue-distribution-chart-stats';
             chartContainer.appendChild(chartDiv);
             document.getElementById('revenue-stats-results').appendChild(chartContainer);
-            Plotly.newPlot('revenue-distribution-chart-stats', data.distribution_chart.data, data.distribution_chart.layout, {responsive: true});
+            Plotly.newPlot('revenue-distribution-chart-stats', data.distribution_chart.data, data.distribution_chart.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
         }
         
         document.getElementById('revenue-stats-results').style.display = 'block';
@@ -608,7 +644,10 @@ document.getElementById('predict-revenue-btn').addEventListener('click', functio
         document.getElementById('avg-delay').textContent = data.avg_payment_delay;
         
         if (data.forecast_chart) {
-            Plotly.newPlot('revenue-forecast-chart', data.forecast_chart.data, data.forecast_chart.layout, {responsive: true});
+            Plotly.newPlot('revenue-forecast-chart', data.forecast_chart.data, data.forecast_chart.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
         }
         
         document.getElementById('revenue-prediction-results').style.display = 'block';
