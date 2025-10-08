@@ -495,7 +495,7 @@
                     
                     <div class="card mb-4" style="border-radius: 12px; border: 1px solid #e0e0e0;">
                         <div class="card-body">
-                            <h6 class="mb-3"><i class="fas fa-calendar-alt me-2"></i>Date Range Filter (Applied to All Views)</h6>
+                            <h6 class="mb-3"><i class="fas fa-calendar-alt me-2"></i>Date Range Filter</h6>
                             <div class="row g-3 align-items-end">
                                 <div class="col-md-4">
                                     <label class="form-label small">Start Date</label>
@@ -521,90 +521,68 @@
                         <p class="mt-3 text-muted">Analyzing your data...</p>
                     </div>
                     
-                    <!-- Sub-tabs Navigation -->
                     <div id="staffing-results" class="results-section" style="display: none;">
-                        <ul class="nav nav-pills mb-4" id="staffing-subtabs" role="tablist" style="background: #f8f9fa; padding: 0.75rem; border-radius: 12px;">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="staff-overview-tab" data-bs-toggle="pill" data-bs-target="#staff-overview" type="button" role="tab" style="margin-right: 0.5rem;">
-                                    <i class="fas fa-chart-line me-2"></i>Overview
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="staff-analytics-tab" data-bs-toggle="pill" data-bs-target="#staff-analytics" type="button" role="tab">
-                                    <i class="fas fa-brain me-2"></i>Analytics & Export
-                                </button>
-                            </li>
-                        </ul>
-                        
-                        <div class="tab-content" id="staffing-subtabs-content">
-                            <!-- Sub-tab 1: Overview -->
-                            <div class="tab-pane fade show active" id="staff-overview" role="tabpanel">
-                                <div class="row mb-4">
-                                    <div class="col-md-4">
-                                        <div class="metric-card">
-                                            <div class="metric-icon"><i class="fas fa-dollar-sign"></i></div>
-                                            <div class="metric-label">Total Costs</div>
-                                            <div class="metric-value" id="total-cost">$0</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="metric-card orange">
-                                            <div class="metric-icon"><i class="fas fa-clock"></i></div>
-                                            <div class="metric-label">Avg Hourly Rate</div>
-                                            <div class="metric-value" id="avg-hourly-rate">$0</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="metric-card teal">
-                                            <div class="metric-icon"><i class="fas fa-user-nurse"></i></div>
-                                            <div class="metric-label">Staff Count</div>
-                                            <div class="metric-value" id="total-staff">0</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row mb-4">
-                                    <div class="col-md-6">
-                                        <div class="chart-container">
-                                            <div id="cost-trend-chart"></div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="chart-container">
-                                            <div id="care-level-chart"></div>
-                                        </div>
-                                    </div>
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="metric-card">
+                                    <div class="metric-icon"><i class="fas fa-dollar-sign"></i></div>
+                                    <div class="metric-label">Total Costs</div>
+                                    <div class="metric-value" id="total-cost">$0</div>
                                 </div>
                             </div>
-                            
-                            <!-- Sub-tab 2: Analytics & Export -->
-                            <div class="tab-pane fade" id="staff-analytics" role="tabpanel">
-                                <div class="text-center mb-4">
-                                    <button class="btn btn-analyze me-2" id="predict-staffing-btn">
-                                        <i class="fas fa-brain me-2"></i>Generate Cost Forecast
-                                    </button>
-                                    <button class="btn btn-analyze me-2" id="analyze-staffing-stats-btn" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%);">
-                                        <i class="fas fa-chart-pie me-2"></i>Statistical Analysis
-                                    </button>
-                                    <a href="/export_staffing_analysis" class="btn btn-analyze" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
-                                        <i class="fas fa-download me-2"></i>Download CSV
-                                    </a>
+                            <div class="col-md-4">
+                                <div class="metric-card orange">
+                                    <div class="metric-icon"><i class="fas fa-clock"></i></div>
+                                    <div class="metric-label">Avg Hourly Rate</div>
+                                    <div class="metric-value" id="avg-hourly-rate">$0</div>
                                 </div>
-                                
-                                <div id="staffing-prediction-results" style="display: none;">
-                                    <div class="alert alert-custom alert-info">
-                                        <h5><i class="fas fa-chart-line me-2"></i>Forecast Results</h5>
-                                        <p class="mb-1">Next Month Projection: <strong id="next-month-cost">$0</strong></p>
-                                        <p class="mb-0">6-Month Total: <strong id="six-month-total">$0</strong></p>
-                                    </div>
-                                    <div class="chart-container">
-                                        <div id="staffing-forecast-chart"></div>
-                                    </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="metric-card teal">
+                                    <div class="metric-icon"><i class="fas fa-user-nurse"></i></div>
+                                    <div class="metric-label">Staff Count</div>
+                                    <div class="metric-value" id="total-staff">0</div>
                                 </div>
-                                
-                                <div id="staffing-stats-results" style="display: none;"></div>
                             </div>
                         </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <div id="cost-trend-chart"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <div id="care-level-chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mb-4">
+                            <button class="btn btn-analyze me-2" id="predict-staffing-btn">
+                                <i class="fas fa-brain me-2"></i>Generate Cost Forecast
+                            </button>
+                            <button class="btn btn-analyze me-2" id="analyze-staffing-stats-btn" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%);">
+                                <i class="fas fa-chart-pie me-2"></i>Statistical Analysis
+                            </button>
+                            <a href="/export_staffing_analysis" class="btn btn-analyze" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                                <i class="fas fa-download me-2"></i>Download CSV
+                            </a>
+                        </div>
+                        
+                        <div id="staffing-prediction-results" style="display: none;">
+                            <div class="alert alert-custom alert-info">
+                                <h5><i class="fas fa-chart-line me-2"></i>Forecast Results</h5>
+                                <p class="mb-1">Next Month Projection: <strong id="next-month-cost">$0</strong></p>
+                                <p class="mb-0">6-Month Total: <strong id="six-month-total">$0</strong></p>
+                            </div>
+                            <div class="chart-container">
+                                <div id="staffing-forecast-chart"></div>
+                            </div>
+                        </div>
+                        
+                        <div id="staffing-stats-results" style="display: none;"></div>
                     </div>
                 </div>
                 
@@ -622,7 +600,7 @@
                     
                     <div class="card mb-4" style="border-radius: 12px; border: 1px solid #e0e0e0;">
                         <div class="card-body">
-                            <h6 class="mb-3"><i class="fas fa-calendar-alt me-2"></i>Date Range Filter (Applied to All Views)</h6>
+                            <h6 class="mb-3"><i class="fas fa-calendar-alt me-2"></i>Date Range Filter</h6>
                             <div class="row g-3 align-items-end">
                                 <div class="col-md-4">
                                     <label class="form-label small">Start Date</label>
@@ -645,259 +623,4 @@
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
-                        <p class="mt-3 text-muted">Analyzing your data...</p>
-                    </div>
-                    
-                    <!-- Sub-tabs Navigation -->
-                    <div id="revenue-results" class="results-section" style="display: none;">
-                        <ul class="nav nav-pills mb-4" id="revenue-subtabs" role="tablist" style="background: #f8f9fa; padding: 0.75rem; border-radius: 12px;">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="rev-overview-tab" data-bs-toggle="pill" data-bs-target="#rev-overview" type="button" role="tab" style="margin-right: 0.5rem;">
-                                    <i class="fas fa-chart-line me-2"></i>Overview
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="rev-analytics-tab" data-bs-toggle="pill" data-bs-target="#rev-analytics" type="button" role="tab">
-                                    <i class="fas fa-brain me-2"></i>Analytics & Export
-                                </button>
-                            </li>
-                        </ul>
-                        
-                        <div class="tab-content" id="revenue-subtabs-content">
-                            <!-- Sub-tab 1: Overview -->
-                            <div class="tab-pane fade show active" id="rev-overview" role="tabpanel">
-                                <div class="row mb-4">
-                                    <div class="col-md-6">
-                                        <div class="metric-card">
-                                            <div class="metric-icon"><i class="fas fa-dollar-sign"></i></div>
-                                            <div class="metric-label">Total Revenue</div>
-                                            <div class="metric-value" id="total-revenue">$0</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="metric-card orange">
-                                            <div class="metric-icon"><i class="fas fa-chart-line"></i></div>
-                                            <div class="metric-label">Average Revenue</div>
-                                            <div class="metric-value" id="avg-revenue">$0</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row mb-4">
-                                    <div class="col-md-6">
-                                        <div class="chart-container">
-                                            <div id="payer-chart"></div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="chart-container">
-                                            <div id="revenue-trend-chart"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Sub-tab 2: Analytics & Export -->
-                            <div class="tab-pane fade" id="rev-analytics" role="tabpanel">
-                                <div class="text-center mb-4">
-                                    <button class="btn btn-analyze me-2" id="predict-revenue-btn">
-                                        <i class="fas fa-brain me-2"></i>Generate Revenue Forecast
-                                    </button>
-                                    <button class="btn btn-analyze me-2" id="analyze-revenue-stats-btn" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%);">
-                                        <i class="fas fa-chart-pie me-2"></i>Statistical Analysis
-                                    </button>
-                                    <a href="/export_revenue_analysis" class="btn btn-analyze" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
-                                        <i class="fas fa-download me-2"></i>Download CSV
-                                    </a>
-                                </div>
-                                
-                                <div id="revenue-prediction-results" style="display: none;">
-                                    <div class="alert alert-custom alert-info">
-                                        <h5><i class="fas fa-chart-line me-2"></i>Forecast Results</h5>
-                                        <p class="mb-1">Next Month: <strong id="next-month-revenue">$0</strong></p>
-                                        <p class="mb-1">6-Month Total: <strong id="six-month-revenue">$0</strong></p>
-                                        <p class="mb-0">Avg Payment Delay: <strong id="avg-delay">0</strong> days</p>
-                                    </div>
-                                    <div class="chart-container">
-                                        <div id="revenue-forecast-chart"></div>
-                                    </div>
-                                </div>
-                                
-                                <div id="revenue-stats-results" style="display: none;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- TAB 4: Cash Flow -->
-                <div class="tab-pane fade" id="cashflow" role="tabpanel">
-                    <div class="section-header">
-                        <h4><i class="fas fa-hand-holding-usd text-primary me-2"></i>Cash Flow Analysis</h4>
-                        <p>Monitor cash flow, analyze burn rate, and track profitability.</p>
-                    </div>
-                    
-                    <div class="alert alert-custom alert-info mb-4">
-                        <h6><i class="fas fa-info-circle me-2"></i>Auto-Generated from Revenue & Staffing Data</h6>
-                        <p class="mb-0 small">Cash flow analysis combines revenue and staffing cost data.</p>
-                    </div>
-                    
-                    <div class="card mb-4" style="border-radius: 12px; border: 1px solid #e0e0e0;">
-                        <div class="card-body">
-                            <h6 class="mb-3"><i class="fas fa-calendar-alt me-2"></i>Date Range Filter (Applied to All Views)</h6>
-                            <div class="row g-3 align-items-end">
-                                <div class="col-md-4">
-                                    <label class="form-label small">Start Date</label>
-                                    <input type="date" class="form-control" id="cashflow-start-date">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label small">End Date</label>
-                                    <input type="date" class="form-control" id="cashflow-end-date">
-                                </div>
-                                <div class="col-md-4">
-                                    <button class="btn btn-analyze w-100" id="cashflow-apply-filter">
-                                        <i class="fas fa-filter me-2"></i>Apply Filter
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="text-center mb-4">
-                        <button class="btn btn-analyze" id="analyze-cashflow-btn">
-                            <i class="fas fa-calculator me-2"></i>Run Cash Flow Analysis
-                        </button>
-                    </div>
-                    
-                    <!-- Sub-tabs Navigation -->
-                    <ul class="nav nav-pills mb-4" id="cashflow-subtabs" role="tablist" style="background: #f8f9fa; padding: 0.75rem; border-radius: 12px;">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="cf-overview-tab" data-bs-toggle="pill" data-bs-target="#cf-overview" type="button" role="tab" style="margin-right: 0.5rem;">
-                                <i class="fas fa-chart-line me-2"></i>Overview
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="cf-calendar-tab" data-bs-toggle="pill" data-bs-target="#cf-calendar" type="button" role="tab">
-                                <i class="fas fa-calendar-check me-2"></i>Calendar
-                            </button>
-                        </li>
-                    </ul>
-                    
-                    <div class="tab-content" id="cashflow-subtabs-content">
-                        <!-- Sub-tab 1: Overview -->
-                        <div class="tab-pane fade show active" id="cf-overview" role="tabpanel">
-                            <div class="row mb-4">
-                                <div class="col-md-4">
-                                    <div class="metric-card">
-                                        <div class="metric-icon"><i class="fas fa-money-bill-wave"></i></div>
-                                        <div class="metric-label">Net Cash Flow</div>
-                                        <div class="metric-value" id="net-cashflow">$0</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="metric-card orange">
-                                        <div class="metric-icon"><i class="fas fa-fire"></i></div>
-                                        <div class="metric-label">Daily Burn Rate</div>
-                                        <div class="metric-value" id="burn-rate">$0</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="metric-card teal">
-                                        <div class="metric-icon"><i class="fas fa-percent"></i></div>
-                                        <div class="metric-label">Profit Margin</div>
-                                        <div class="metric-value" id="profit-margin">0%</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <div class="chart-container">
-                                        <div id="cashflow-trend-chart"></div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="chart-container">
-                                        <div id="cumulative-cashflow-chart"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row mb-4">
-                                <div class="col-md-12">
-                                    <div class="chart-container">
-                                        <div id="summary-chart"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Sub-tab 2: Calendar -->
-                        <div class="tab-pane fade" id="cf-calendar" role="tabpanel">
-                            <div class="card" style="border-radius: 12px; border: 1px solid #e0e0e0;">
-                                <div class="card-body">
-                                    <h5 class="mb-3"><i class="fas fa-calendar-alt me-2"></i>Cash Flow Calendar</h5>
-                                    <p class="text-muted small mb-4">View expected and actual cash flow by date</p>
-                                    
-                                    <div class="row mb-3">
-                                        <div class="col-md-12 text-center">
-                                            <button class="btn btn-sm btn-outline-secondary me-2" id="cf-prev-month-btn">
-                                                <i class="fas fa-chevron-left"></i> Previous
-                                            </button>
-                                            <span class="h5 mx-3" id="cf-calendar-month-year"></span>
-                                            <button class="btn btn-sm btn-outline-secondary ms-2" id="cf-next-month-btn">
-                                                Next <i class="fas fa-chevron-right"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    
-                                    <div id="cashflow-calendar" style="overflow-x: auto;"></div>
-                                    
-                                    <div id="cashflow-details-section" style="display: none; margin-top: 2rem;">
-                                        <h6 class="mb-3"><i class="fas fa-money-check-alt me-2"></i>Transactions for <span id="cf-selected-date-display"></span></h6>
-                                        <div class="row mb-3">
-                                            <div class="col-md-4">
-                                                <div class="alert alert-success mb-0">
-                                                    <strong>Revenue:</strong> $<span id="cf-revenue">0</span>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <div class="alert alert-danger mb-0">
-                                                    <strong>Costs:</strong> $<span id="cf-costs">0</span>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <div class="alert alert-info mb-0">
-                                                    <strong>Net:</strong> $<span id="cf-net">0</span> (<span id="cf-type"></span>)
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="table-responsive">
-                                            <table class="table table-hover">
-                                                <thead class="table-light">
-                                                    <tr>
-                                                        <th>Type</th>
-                                                        <th>Payer/Category</th>
-                                                        <th>Amount</th>
-                                                        <th>Service Date</th>
-                                                        <th>Expected Date</th>
-                                                        <th>Status</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="cashflow-transactions-table"></tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
-{% endblock %}
+                        <p class="mt-3 text-muted">Analyzing your data...</p

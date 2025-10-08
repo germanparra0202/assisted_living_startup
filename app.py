@@ -169,6 +169,100 @@ def upload_occupancy():
             else:
                 condition_chart = None
             
+            # Bed Status Breakdown Chart - Comprehensive breakdown of all bed categories
+            bed_status_chart = None
+            if all(col in df.columns for col in ['occupied_beds', 'vacant_beds', 'pending_beds', 'moving_out_beds']):
+                avg_occupied = df['occupied_beds'].mean()
+                avg_vacant = df['vacant_beds'].mean()
+                avg_pending = df['pending_beds'].mean()
+                avg_moving_out = df['moving_out_beds'].mean()
+                
+                fig3 = go.Figure(data=[go.Pie(
+                    labels=['Occupied', 'Vacant', 'Pending', 'Moving Out'],
+                    values=[avg_occupied, avg_vacant, avg_pending, avg_moving_out],
+                    hole=0.4,
+                    marker=dict(colors=['#0077BB', '#EE7733', '#009988', '#CC3311']),
+                    textinfo='label+value+percent',
+                    textfont_size=12
+                )])
+                fig3.update_layout(
+                    title='Bed Status Breakdown (All Categories)',
+                    template='plotly_white',
+                    showlegend=True
+                )
+                bed_status_chart = json.loads(fig3.to_json())
+            
+            # Unit Breakdown Chart - Shows all bed categories by unit
+            unit_breakdown_chart = None
+            if 'unit' in df.columns and all(col in df.columns for col in ['occupied_beds', 'vacant_beds', 'pending_beds', 'moving_out_beds']):
+                # Calculate average bed counts by unit
+                unit_breakdown = df.groupby('unit').agg({
+                    'occupied_beds': 'mean',
+                    'vacant_beds': 'mean',
+                    'pending_beds': 'mean',
+                    'moving_out_beds': 'mean'
+                }).reset_index()
+                
+                fig4 = go.Figure()
+                fig4.add_trace(go.Bar(
+                    name='Occupied',
+                    x=unit_breakdown['unit'],
+                    y=unit_breakdown['occupied_beds'],
+                    marker_color='#0077BB'
+                ))
+                fig4.add_trace(go.Bar(
+                    name='Vacant',
+                    x=unit_breakdown['unit'],
+                    y=unit_breakdown['vacant_beds'],
+                    marker_color='#EE7733'
+                ))
+                fig4.add_trace(go.Bar(
+                    name='Pending',
+                    x=unit_breakdown['unit'],
+                    y=unit_breakdown['pending_beds'],
+                    marker_color='#009988'
+                ))
+                fig4.add_trace(go.Bar(
+                    name='Moving Out',
+                    x=unit_breakdown['unit'],
+                    y=unit_breakdown['moving_out_beds'],
+                    marker_color='#CC3311'
+                ))
+                
+                fig4.update_layout(
+                    title='Unit Breakdown - Beds by Category',
+                    xaxis_title='Unit',
+                    yaxis_title='Average Bed Count',
+                    barmode='group',
+                    template='plotly_white',
+                    showlegend=True
+                )
+                unit_breakdown_chart = json.loads(fig4.to_json())
+            
+            # Potential Clients Trend Chart
+            potential_clients_chart = None
+            if 'date' in df.columns and 'potential_clients' in df.columns:
+                df['date'] = pd.to_datetime(df['date'])
+                daily_potential = df.groupby('date')['potential_clients'].mean().reset_index()
+                
+                fig5 = go.Figure()
+                fig5.add_trace(go.Scatter(
+                    x=daily_potential['date'],
+                    y=daily_potential['potential_clients'],
+                    mode='lines+markers',
+                    name='Potential Clients',
+                    line=dict(color='#009988', width=3),
+                    fill='tozeroy'
+                ))
+                fig5.update_layout(
+                    title='Potential Clients Trend',
+                    xaxis_title='Date',
+                    yaxis_title='Number of Potential Clients',
+                    template='plotly_white',
+                    hovermode='x unified'
+                )
+                potential_clients_chart = json.loads(fig5.to_json())
+            
             # Get min and max dates for filter defaults
             min_date = None
             max_date = None
@@ -184,6 +278,9 @@ def upload_occupancy():
                 'occupied_beds': int(avg_occupied_beds),
                 'trend_chart': trend_chart,
                 'condition_chart': condition_chart,
+                'bed_status_chart': bed_status_chart,
+                'unit_breakdown_chart': unit_breakdown_chart,
+                'potential_clients_chart': potential_clients_chart,
                 'data_preview': convert_to_serializable(df.head(10).to_dict('records')),
                 'min_date': min_date,
                 'max_date': max_date

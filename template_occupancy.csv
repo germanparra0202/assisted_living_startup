@@ -1,4 +1,3 @@
-date,occupancy_rate,total_beds,occupied_beds,condition,age,condition_severity,stay_duration
-2024-01-01,85.5,100,85,Dementia,78,3,45
-2024-01-02,86.0,100,86,Alzheimers,82,4,120
-2024-01-03,84.5,100,84,Heart Disease,75,2,30
+date,occupancy_rate,total_beds,occupied_beds,vacant_beds,pending_beds,moving_out_beds,potential_clients,unit,condition,age,condition_severity,stay_duration
+2024-01-01,85.5,100,86,10,2,2,5,Unit A,Alzheimers,78,3,120
+2024-01-02,87.2,100,87,9,2,2,4,Unit B,Dementia,82,4,95

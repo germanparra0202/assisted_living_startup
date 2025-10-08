@@ -185,6 +185,28 @@ function uploadOccupancyData(file, startDate = null, endDate = null) {
             });
         }
         
+        // Render new charts
+        if (data.bed_status_chart) {
+            Plotly.newPlot('bed-status-chart', data.bed_status_chart.data, data.bed_status_chart.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
+        }
+        
+        if (data.unit_breakdown_chart) {
+            Plotly.newPlot('unit-breakdown-chart', data.unit_breakdown_chart.data, data.unit_breakdown_chart.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
+        }
+        
+        if (data.potential_clients_chart) {
+            Plotly.newPlot('potential-clients-chart', data.potential_clients_chart.data, data.potential_clients_chart.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
+        }
+        
         document.getElementById('occupancy-results').style.display = 'block';
     })
     .catch(error => {
