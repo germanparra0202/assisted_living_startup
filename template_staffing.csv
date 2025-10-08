@@ -1,0 +1,4 @@
+date,total_cost,hourly_rate,staff_count,care_level
+2024-01-01,5000,25.50,15,Basic
+2024-01-02,6200,28.00,18,Advanced
+2024-01-03,5400,26.00,16,Basic

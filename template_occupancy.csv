@@ -1,0 +1,4 @@
+date,occupancy_rate,total_beds,occupied_beds,condition,age,condition_severity,stay_duration
+2024-01-01,85.5,100,85,Dementia,78,3,45
+2024-01-02,86.0,100,86,Alzheimers,82,4,120
+2024-01-03,84.5,100,84,Heart Disease,75,2,30

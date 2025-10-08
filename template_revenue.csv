@@ -1,0 +1,4 @@
+date,amount,payer_type,payment_delay_days
+2024-01-01,3500,Private Pay,0
+2024-01-02,4200,Medicare,30
+2024-01-03,2800,Insurance,45
