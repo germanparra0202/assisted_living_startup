@@ -10,39 +10,38 @@ function formatCurrency(value) {
     }).format(value);
 }
 
-// Load example data on page load
-function loadExampleData() {
-    // Load occupancy example data
+// Sample data loading functions
+document.getElementById('load-sample-occupancy-btn').addEventListener('click', function() {
     fetch('/example_data_occupancy.csv')
         .then(response => response.blob())
         .then(blob => {
             const file = new File([blob], 'example_data_occupancy.csv', { type: 'text/csv' });
+            document.getElementById('occupancy-filename').textContent = 'Loaded: 100-row sample data';
             uploadOccupancyData(file);
         })
-        .catch(error => console.log('Example occupancy data not loaded:', error));
-    
-    // Load staffing example data
+        .catch(error => alert('Failed to load sample data: ' + error));
+});
+
+document.getElementById('load-sample-staffing-btn').addEventListener('click', function() {
     fetch('/example_data_staffing.csv')
         .then(response => response.blob())
         .then(blob => {
             const file = new File([blob], 'example_data_staffing.csv', { type: 'text/csv' });
+            document.getElementById('staffing-filename').textContent = 'Loaded: 100-row sample data';
             uploadStaffingData(file);
         })
-        .catch(error => console.log('Example staffing data not loaded:', error));
-    
-    // Load revenue example data
+        .catch(error => alert('Failed to load sample data: ' + error));
+});
+
+document.getElementById('load-sample-revenue-btn').addEventListener('click', function() {
     fetch('/example_data_revenue.csv')
         .then(response => response.blob())
         .then(blob => {
             const file = new File([blob], 'example_data_revenue.csv', { type: 'text/csv' });
+            document.getElementById('revenue-filename').textContent = 'Loaded: 100-row sample data';
             uploadRevenueData(file);
         })
-        .catch(error => console.log('Example revenue data not loaded:', error));
-}
-
-// Load example data when page loads
-window.addEventListener('DOMContentLoaded', function() {
-    loadExampleData();
+        .catch(error => alert('Failed to load sample data: ' + error));
 });
 
 // ========================

@@ -25,15 +25,18 @@ def dashboard():
 # Serve example data files
 @app.route('/example_data_occupancy.csv')
 def serve_example_occupancy():
-    return app.send_static_file('../example_data_occupancy.csv')
+    from flask import send_file
+    return send_file('example_data_occupancy.csv', mimetype='text/csv')
 
 @app.route('/example_data_staffing.csv')
 def serve_example_staffing():
-    return app.send_static_file('../example_data_staffing.csv')
+    from flask import send_file
+    return send_file('example_data_staffing.csv', mimetype='text/csv')
 
 @app.route('/example_data_revenue.csv')
 def serve_example_revenue():
-    return app.send_static_file('../example_data_revenue.csv')
+    from flask import send_file
+    return send_file('example_data_revenue.csv', mimetype='text/csv')
 
 # Serve template files for download
 @app.route('/template_occupancy.csv')
