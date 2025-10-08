@@ -21,6 +21,19 @@ def allowed_file(filename):
 def dashboard():
     return render_template('dashboard.html')
 
+# Serve example data files
+@app.route('/example_data_occupancy.csv')
+def serve_example_occupancy():
+    return app.send_static_file('../example_data_occupancy.csv')
+
+@app.route('/example_data_staffing.csv')
+def serve_example_staffing():
+    return app.send_static_file('../example_data_staffing.csv')
+
+@app.route('/example_data_revenue.csv')
+def serve_example_revenue():
+    return app.send_static_file('../example_data_revenue.csv')
+
 # TAB 1: Occupancy Rate Routes
 @app.route('/upload_occupancy', methods=['POST'])
 def upload_occupancy():
@@ -57,7 +70,7 @@ def upload_occupancy():
                     y=df['occupancy_rate'],
                     mode='lines+markers',
                     name='Occupancy Rate',
-                    line=dict(color='#667eea', width=3)
+                    line=dict(color='#0077BB', width=3)
                 ))
                 fig.update_layout(
                     title='Occupancy Rate Trend',
@@ -76,7 +89,7 @@ def upload_occupancy():
                 fig2 = go.Figure(data=[go.Bar(
                     x=condition_counts.index,
                     y=condition_counts.values,
-                    marker_color='#764ba2'
+                    marker_color=['#0077BB', '#EE7733', '#009988', '#CC3311', '#EE3377', '#33BBEE']
                 )])
                 fig2.update_layout(
                     title='Patient Condition Distribution',
@@ -208,7 +221,7 @@ def upload_staffing():
                     y=df['total_cost'],
                     mode='lines+markers',
                     name='Total Cost',
-                    line=dict(color='#f093fb', width=3),
+                    line=dict(color='#0077BB', width=3),
                     fill='tonexty'
                 ))
                 fig.update_layout(
@@ -228,7 +241,7 @@ def upload_staffing():
                 fig2 = go.Figure(data=[go.Bar(
                     x=care_costs.index,
                     y=care_costs.values,
-                    marker_color=['#667eea', '#764ba2']
+                    marker_color=['#0077BB', '#EE7733']
                 )])
                 fig2.update_layout(
                     title='Cost by Care Level',
@@ -291,14 +304,14 @@ def predict_staffing():
                 y=df['total_cost'],
                 mode='lines+markers',
                 name='Historical',
-                line=dict(color='#667eea', width=3)
+                line=dict(color='#0077BB', width=3)
             ))
             fig.add_trace(go.Scatter(
                 x=future_dates,
                 y=future_costs,
                 mode='lines+markers',
                 name='Forecast',
-                line=dict(color='#f093fb', width=3, dash='dash')
+                line=dict(color='#EE7733', width=3, dash='dash')
             ))
             fig.update_layout(
                 title='Staffing Cost Forecast (6 Months)',
@@ -355,7 +368,7 @@ def upload_revenue():
                     labels=payer_revenue.index,
                     values=payer_revenue.values,
                     hole=0.3,
-                    marker=dict(colors=['#667eea', '#764ba2', '#f093fb', '#4facfe'])
+                    marker=dict(colors=['#0077BB', '#EE7733', '#009988', '#CC3311'])
                 )])
                 fig.update_layout(
                     title='Revenue by Payer Type',
@@ -375,7 +388,7 @@ def upload_revenue():
                     y=daily_revenue['amount'],
                     mode='lines+markers',
                     name='Daily Revenue',
-                    line=dict(color='#4facfe', width=3),
+                    line=dict(color='#0077BB', width=3),
                     fill='tonexty'
                 ))
                 fig2.update_layout(
@@ -440,14 +453,14 @@ def predict_revenue():
                 y=daily_revenue['amount'],
                 mode='lines',
                 name='Historical',
-                line=dict(color='#4facfe', width=2)
+                line=dict(color='#0077BB', width=2)
             ))
             fig.add_trace(go.Scatter(
                 x=future_dates,
                 y=future_revenue,
                 mode='lines',
                 name='Forecast',
-                line=dict(color='#f093fb', width=2, dash='dash')
+                line=dict(color='#EE7733', width=2, dash='dash')
             ))
             fig.update_layout(
                 title='Revenue Forecast (6 Months)',

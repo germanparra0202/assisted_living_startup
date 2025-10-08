@@ -10,6 +10,41 @@ function formatCurrency(value) {
     }).format(value);
 }
 
+// Load example data on page load
+function loadExampleData() {
+    // Load occupancy example data
+    fetch('/example_data_occupancy.csv')
+        .then(response => response.blob())
+        .then(blob => {
+            const file = new File([blob], 'example_data_occupancy.csv', { type: 'text/csv' });
+            uploadOccupancyData(file);
+        })
+        .catch(error => console.log('Example occupancy data not loaded:', error));
+    
+    // Load staffing example data
+    fetch('/example_data_staffing.csv')
+        .then(response => response.blob())
+        .then(blob => {
+            const file = new File([blob], 'example_data_staffing.csv', { type: 'text/csv' });
+            uploadStaffingData(file);
+        })
+        .catch(error => console.log('Example staffing data not loaded:', error));
+    
+    // Load revenue example data
+    fetch('/example_data_revenue.csv')
+        .then(response => response.blob())
+        .then(blob => {
+            const file = new File([blob], 'example_data_revenue.csv', { type: 'text/csv' });
+            uploadRevenueData(file);
+        })
+        .catch(error => console.log('Example revenue data not loaded:', error));
+}
+
+// Load example data when page loads
+window.addEventListener('DOMContentLoaded', function() {
+    loadExampleData();
+});
+
 // ========================
 // TAB 1: OCCUPANCY RATE
 // ========================

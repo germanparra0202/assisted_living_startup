@@ -116,13 +116,21 @@
     }
     
     .metric-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #0077BB 0%, #0099DD 100%);
         color: white;
         border-radius: 16px;
         padding: 1.75rem;
         margin-bottom: 1.5rem;
-        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.25);
+        box-shadow: 0 8px 20px rgba(0, 119, 187, 0.25);
         transition: transform 0.3s ease;
+    }
+    
+    .metric-card.orange {
+        background: linear-gradient(135deg, #EE7733 0%, #FF8844 100%);
+    }
+    
+    .metric-card.teal {
+        background: linear-gradient(135deg, #009988 0%, #00AA99 100%);
     }
     
     .metric-card:hover {
@@ -396,14 +404,14 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="metric-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                <div class="metric-card orange">
                                     <div class="metric-icon"><i class="fas fa-hospital"></i></div>
                                     <div class="metric-label">Total Capacity</div>
                                     <div class="metric-value" id="total-beds">0</div>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="metric-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                <div class="metric-card teal">
                                     <div class="metric-icon"><i class="fas fa-users"></i></div>
                                     <div class="metric-label">Occupied Beds</div>
                                     <div class="metric-value" id="occupied-beds">0</div>
@@ -497,14 +505,14 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="metric-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                <div class="metric-card orange">
                                     <div class="metric-icon"><i class="fas fa-clock"></i></div>
                                     <div class="metric-label">Avg Hourly Rate</div>
                                     <div class="metric-value" id="avg-hourly-rate">$0</div>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="metric-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                <div class="metric-card teal">
                                     <div class="metric-icon"><i class="fas fa-user-nurse"></i></div>
                                     <div class="metric-label">Staff Count</div>
                                     <div class="metric-value" id="total-staff">0</div>
@@ -598,7 +606,7 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="metric-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                <div class="metric-card orange">
                                     <div class="metric-icon"><i class="fas fa-chart-bar"></i></div>
                                     <div class="metric-label">Average Revenue</div>
                                     <div class="metric-value" id="avg-revenue">$0</div>
