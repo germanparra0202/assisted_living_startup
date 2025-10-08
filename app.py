@@ -5,6 +5,7 @@ import os
 from werkzeug.utils import secure_filename
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import LabelEncoder
+from scipy import stats
 import plotly.graph_objects as go
 import plotly.express as px
 import json
@@ -33,6 +34,19 @@ def serve_example_staffing():
 @app.route('/example_data_revenue.csv')
 def serve_example_revenue():
     return app.send_static_file('../example_data_revenue.csv')
+
+# Serve template files for download
+@app.route('/template_occupancy.csv')
+def serve_template_occupancy():
+    return app.send_static_file('../template_occupancy.csv')
+
+@app.route('/template_staffing.csv')
+def serve_template_staffing():
+    return app.send_static_file('../template_staffing.csv')
+
+@app.route('/template_revenue.csv')
+def serve_template_revenue():
+    return app.send_static_file('../template_revenue.csv')
 
 # TAB 1: Occupancy Rate Routes
 @app.route('/upload_occupancy', methods=['POST'])
@@ -490,6 +504,220 @@ def predict_revenue():
             })
         
         return jsonify({'error': 'Required columns not found'}), 400
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# Statistical Analysis Routes
+
+@app.route('/analyze_occupancy_stats', methods=['POST'])
+def analyze_occupancy_stats():
+    try:
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if f.startswith('occupancy_')][0])
+        
+        if filepath.endswith('.csv'):
+            df = pd.read_csv(filepath)
+        else:
+            df = pd.read_excel(filepath)
+        
+        # Descriptive statistics
+        stats_summary = {
+            'occupancy_rate': {
+                'mean': float(df['occupancy_rate'].mean()) if 'occupancy_rate' in df.columns else 0,
+                'median': float(df['occupancy_rate'].median()) if 'occupancy_rate' in df.columns else 0,
+                'std_dev': float(df['occupancy_rate'].std()) if 'occupancy_rate' in df.columns else 0,
+                'min': float(df['occupancy_rate'].min()) if 'occupancy_rate' in df.columns else 0,
+                'max': float(df['occupancy_rate'].max()) if 'occupancy_rate' in df.columns else 0
+            },
+            'age': {
+                'mean': float(df['age'].mean()) if 'age' in df.columns else 0,
+                'median': float(df['age'].median()) if 'age' in df.columns else 0,
+                'std_dev': float(df['age'].std()) if 'age' in df.columns else 0
+            },
+            'stay_duration': {
+                'mean': float(df['stay_duration'].mean()) if 'stay_duration' in df.columns else 0,
+                'median': float(df['stay_duration'].median()) if 'stay_duration' in df.columns else 0,
+                'std_dev': float(df['stay_duration'].std()) if 'stay_duration' in df.columns else 0
+            }
+        }
+        
+        # Correlation analysis
+        if all(col in df.columns for col in ['age', 'condition_severity', 'stay_duration']):
+            corr_matrix = df[['age', 'condition_severity', 'stay_duration']].corr()
+            
+            fig = go.Figure(data=go.Heatmap(
+                z=corr_matrix.values,
+                x=corr_matrix.columns,
+                y=corr_matrix.columns,
+                colorscale='RdBu',
+                zmid=0
+            ))
+            fig.update_layout(title='Correlation Matrix', template='plotly_white')
+            correlation_chart = json.loads(fig.to_json())
+        else:
+            correlation_chart = None
+        
+        # Distribution analysis
+        if 'age' in df.columns:
+            fig2 = go.Figure(data=[go.Histogram(x=df['age'], nbinsx=20, marker_color='#0077BB')])
+            fig2.update_layout(title='Age Distribution', xaxis_title='Age', yaxis_title='Frequency', template='plotly_white')
+            distribution_chart = json.loads(fig2.to_json())
+        else:
+            distribution_chart = None
+        
+        return jsonify({
+            'success': True,
+            'statistics': stats_summary,
+            'correlation_chart': correlation_chart,
+            'distribution_chart': distribution_chart,
+            'total_records': len(df)
+        })
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/analyze_staffing_stats', methods=['POST'])
+def analyze_staffing_stats():
+    try:
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if f.startswith('staffing_')][0])
+        
+        if filepath.endswith('.csv'):
+            df = pd.read_csv(filepath)
+        else:
+            df = pd.read_excel(filepath)
+        
+        # Descriptive statistics
+        stats_summary = {
+            'total_cost': {
+                'mean': float(df['total_cost'].mean()) if 'total_cost' in df.columns else 0,
+                'median': float(df['total_cost'].median()) if 'total_cost' in df.columns else 0,
+                'std_dev': float(df['total_cost'].std()) if 'total_cost' in df.columns else 0,
+                'variance': float(df['total_cost'].var()) if 'total_cost' in df.columns else 0
+            },
+            'hourly_rate': {
+                'mean': float(df['hourly_rate'].mean()) if 'hourly_rate' in df.columns else 0,
+                'median': float(df['hourly_rate'].median()) if 'hourly_rate' in df.columns else 0,
+                'std_dev': float(df['hourly_rate'].std()) if 'hourly_rate' in df.columns else 0
+            },
+            'staff_count': {
+                'mean': float(df['staff_count'].mean()) if 'staff_count' in df.columns else 0,
+                'total': int(df['staff_count'].sum()) if 'staff_count' in df.columns else 0
+            }
+        }
+        
+        # Cost variance by care level
+        if 'care_level' in df.columns and 'total_cost' in df.columns:
+            variance_by_level = df.groupby('care_level')['total_cost'].agg(['mean', 'std', 'var']).to_dict('index')
+            
+            fig = go.Figure()
+            for level in variance_by_level:
+                fig.add_trace(go.Box(y=[variance_by_level[level]['mean']], name=level, marker_color='#0077BB'))
+            fig.update_layout(title='Cost Variance by Care Level', yaxis_title='Cost ($)', template='plotly_white')
+            variance_chart = json.loads(fig.to_json())
+        else:
+            variance_by_level = {}
+            variance_chart = None
+        
+        # Trend analysis
+        if 'date' in df.columns and 'total_cost' in df.columns:
+            df['date'] = pd.to_datetime(df['date'])
+            df = df.sort_values('date')
+            
+            # Calculate trend using linear regression
+            df['days'] = (df['date'] - df['date'].min()).dt.days
+            slope, intercept, r_value, p_value, std_err = stats.linregress(df['days'], df['total_cost'])
+            
+            trend_info = {
+                'slope': float(slope),
+                'r_squared': float(r_value ** 2),
+                'p_value': float(p_value),
+                'trend_direction': 'increasing' if slope > 0 else 'decreasing',
+                'significance': 'significant' if p_value < 0.05 else 'not significant'
+            }
+        else:
+            trend_info = {}
+        
+        return jsonify({
+            'success': True,
+            'statistics': stats_summary,
+            'variance_by_level': variance_by_level,
+            'variance_chart': variance_chart,
+            'trend_analysis': trend_info,
+            'total_records': len(df)
+        })
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/analyze_revenue_stats', methods=['POST'])
+def analyze_revenue_stats():
+    try:
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if f.startswith('revenue_')][0])
+        
+        if filepath.endswith('.csv'):
+            df = pd.read_csv(filepath)
+        else:
+            df = pd.read_excel(filepath)
+        
+        # Descriptive statistics
+        stats_summary = {
+            'amount': {
+                'mean': float(df['amount'].mean()) if 'amount' in df.columns else 0,
+                'median': float(df['amount'].median()) if 'amount' in df.columns else 0,
+                'std_dev': float(df['amount'].std()) if 'amount' in df.columns else 0,
+                'total': float(df['amount'].sum()) if 'amount' in df.columns else 0,
+                'variance': float(df['amount'].var()) if 'amount' in df.columns else 0
+            },
+            'payment_delay': {
+                'mean': float(df['payment_delay_days'].mean()) if 'payment_delay_days' in df.columns else 0,
+                'median': float(df['payment_delay_days'].median()) if 'payment_delay_days' in df.columns else 0,
+                'max': float(df['payment_delay_days'].max()) if 'payment_delay_days' in df.columns else 0
+            }
+        }
+        
+        # Revenue by payer type statistics
+        if 'payer_type' in df.columns and 'amount' in df.columns:
+            payer_stats = df.groupby('payer_type')['amount'].agg(['mean', 'sum', 'count', 'std']).to_dict('index')
+            
+            # Create box plot for revenue distribution by payer
+            fig = go.Figure()
+            for payer in df['payer_type'].unique():
+                payer_data = df[df['payer_type'] == payer]['amount']
+                fig.add_trace(go.Box(y=payer_data, name=payer, marker_color='#0077BB'))
+            fig.update_layout(title='Revenue Distribution by Payer Type', yaxis_title='Amount ($)', template='plotly_white')
+            distribution_chart = json.loads(fig.to_json())
+        else:
+            payer_stats = {}
+            distribution_chart = None
+        
+        # Trend analysis
+        if 'date' in df.columns and 'amount' in df.columns:
+            df['date'] = pd.to_datetime(df['date'])
+            daily_revenue = df.groupby('date')['amount'].sum().reset_index()
+            daily_revenue = daily_revenue.sort_values('date')
+            
+            daily_revenue['days'] = (daily_revenue['date'] - daily_revenue['date'].min()).dt.days
+            slope, intercept, r_value, p_value, std_err = stats.linregress(daily_revenue['days'], daily_revenue['amount'])
+            
+            trend_info = {
+                'slope': float(slope),
+                'r_squared': float(r_value ** 2),
+                'p_value': float(p_value),
+                'trend_direction': 'increasing' if slope > 0 else 'decreasing',
+                'significance': 'significant' if p_value < 0.05 else 'not significant',
+                'daily_growth_rate': float(slope)
+            }
+        else:
+            trend_info = {}
+        
+        return jsonify({
+            'success': True,
+            'statistics': stats_summary,
+            'payer_statistics': payer_stats,
+            'distribution_chart': distribution_chart,
+            'trend_analysis': trend_info,
+            'total_records': len(df)
+        })
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500

@@ -373,14 +373,33 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="info-box">
-                                <h6><i class="fas fa-info-circle me-2"></i>Required Columns</h6>
-                                <p class="small mb-2">Your data should include:</p>
-                                <ul class="feature-list small">
-                                    <li><i class="fas fa-check-circle"></i> date, occupancy_rate</li>
-                                    <li><i class="fas fa-check-circle"></i> total_beds, occupied_beds</li>
-                                    <li><i class="fas fa-check-circle"></i> condition, age</li>
-                                    <li><i class="fas fa-check-circle"></i> condition_severity, stay_duration</li>
-                                </ul>
+                                <h6><i class="fas fa-download me-2"></i>Download Template</h6>
+                                <p class="small mb-3">Get a pre-formatted CSV template with all required columns</p>
+                                <a href="/template_occupancy.csv" download class="btn btn-sm btn-outline-primary w-100 mb-3">
+                                    <i class="fas fa-file-csv me-2"></i>Download Template
+                                </a>
+                                <h6 class="mt-3"><i class="fas fa-table me-2"></i>Data Structure</h6>
+                                <div class="table-responsive" style="font-size: 0.8rem;">
+                                    <table class="table table-sm table-bordered">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Column</th>
+                                                <th>Type</th>
+                                                <th>Example</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td>date</td><td>Date</td><td>2024-01-01</td></tr>
+                                            <tr><td>occupancy_rate</td><td>Number</td><td>85.5</td></tr>
+                                            <tr><td>total_beds</td><td>Integer</td><td>100</td></tr>
+                                            <tr><td>occupied_beds</td><td>Integer</td><td>85</td></tr>
+                                            <tr><td>condition</td><td>Text</td><td>Dementia</td></tr>
+                                            <tr><td>age</td><td>Integer</td><td>78</td></tr>
+                                            <tr><td>condition_severity</td><td>Integer (1-5)</td><td>3</td></tr>
+                                            <tr><td>stay_duration</td><td>Integer (days)</td><td>45</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -433,8 +452,11 @@
                         </div>
                         
                         <div class="text-center mb-4">
-                            <button class="btn btn-analyze" id="predict-occupancy-btn">
+                            <button class="btn btn-analyze me-3" id="predict-occupancy-btn">
                                 <i class="fas fa-brain me-2"></i>Generate AI Predictions
+                            </button>
+                            <button class="btn btn-analyze" id="analyze-occupancy-stats-btn" style="background: linear-gradient(135deg, #009988 0%, #00AA99 100%);">
+                                <i class="fas fa-chart-pie me-2"></i>Statistical Analysis
                             </button>
                         </div>
                         
@@ -476,14 +498,30 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="info-box">
-                                <h6><i class="fas fa-info-circle me-2"></i>Required Columns</h6>
-                                <p class="small mb-2">Your data should include:</p>
-                                <ul class="feature-list small">
-                                    <li><i class="fas fa-check-circle"></i> date, total_cost</li>
-                                    <li><i class="fas fa-check-circle"></i> hourly_rate</li>
-                                    <li><i class="fas fa-check-circle"></i> staff_count</li>
-                                    <li><i class="fas fa-check-circle"></i> care_level</li>
-                                </ul>
+                                <h6><i class="fas fa-download me-2"></i>Download Template</h6>
+                                <p class="small mb-3">Get a pre-formatted CSV template with all required columns</p>
+                                <a href="/template_staffing.csv" download class="btn btn-sm btn-outline-primary w-100 mb-3">
+                                    <i class="fas fa-file-csv me-2"></i>Download Template
+                                </a>
+                                <h6 class="mt-3"><i class="fas fa-table me-2"></i>Data Structure</h6>
+                                <div class="table-responsive" style="font-size: 0.8rem;">
+                                    <table class="table table-sm table-bordered">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Column</th>
+                                                <th>Type</th>
+                                                <th>Example</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td>date</td><td>Date</td><td>2024-01-01</td></tr>
+                                            <tr><td>total_cost</td><td>Number</td><td>5000</td></tr>
+                                            <tr><td>hourly_rate</td><td>Number</td><td>25.50</td></tr>
+                                            <tr><td>staff_count</td><td>Integer</td><td>15</td></tr>
+                                            <tr><td>care_level</td><td>Text</td><td>Basic/Advanced</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -534,8 +572,11 @@
                         </div>
                         
                         <div class="text-center mb-4">
-                            <button class="btn btn-analyze" id="predict-staffing-btn">
+                            <button class="btn btn-analyze me-3" id="predict-staffing-btn">
                                 <i class="fas fa-brain me-2"></i>Generate Cost Forecast
+                            </button>
+                            <button class="btn btn-analyze" id="analyze-staffing-stats-btn" style="background: linear-gradient(135deg, #009988 0%, #00AA99 100%);">
+                                <i class="fas fa-chart-pie me-2"></i>Statistical Analysis
                             </button>
                         </div>
                         
@@ -578,13 +619,29 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="info-box">
-                                <h6><i class="fas fa-info-circle me-2"></i>Required Columns</h6>
-                                <p class="small mb-2">Your data should include:</p>
-                                <ul class="feature-list small">
-                                    <li><i class="fas fa-check-circle"></i> date, amount</li>
-                                    <li><i class="fas fa-check-circle"></i> payer_type</li>
-                                    <li><i class="fas fa-check-circle"></i> payment_delay_days</li>
-                                </ul>
+                                <h6><i class="fas fa-download me-2"></i>Download Template</h6>
+                                <p class="small mb-3">Get a pre-formatted CSV template with all required columns</p>
+                                <a href="/template_revenue.csv" download class="btn btn-sm btn-outline-primary w-100 mb-3">
+                                    <i class="fas fa-file-csv me-2"></i>Download Template
+                                </a>
+                                <h6 class="mt-3"><i class="fas fa-table me-2"></i>Data Structure</h6>
+                                <div class="table-responsive" style="font-size: 0.8rem;">
+                                    <table class="table table-sm table-bordered">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Column</th>
+                                                <th>Type</th>
+                                                <th>Example</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td>date</td><td>Date</td><td>2024-01-01</td></tr>
+                                            <tr><td>amount</td><td>Number</td><td>3500</td></tr>
+                                            <tr><td>payer_type</td><td>Text</td><td>Private Pay/Medicare/Insurance</td></tr>
+                                            <tr><td>payment_delay_days</td><td>Integer</td><td>30</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -628,8 +685,11 @@
                         </div>
                         
                         <div class="text-center mb-4">
-                            <button class="btn btn-analyze" id="predict-revenue-btn">
+                            <button class="btn btn-analyze me-3" id="predict-revenue-btn">
                                 <i class="fas fa-brain me-2"></i>Generate Revenue Forecast
+                            </button>
+                            <button class="btn btn-analyze" id="analyze-revenue-stats-btn" style="background: linear-gradient(135deg, #009988 0%, #00AA99 100%);">
+                                <i class="fas fa-chart-pie me-2"></i>Statistical Analysis
                             </button>
                         </div>
                         
