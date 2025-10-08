@@ -10,6 +10,14 @@ function formatCurrency(value) {
     }).format(value);
 }
 
+// Store current date filters
+let currentFilters = {
+    occupancy: { startDate: null, endDate: null },
+    staffing: { startDate: null, endDate: null },
+    revenue: { startDate: null, endDate: null },
+    cashflow: { startDate: null, endDate: null }
+};
+
 // Auto-load sample data on page load
 document.addEventListener('DOMContentLoaded', function() {
     // Load occupancy data automatically
@@ -38,15 +46,89 @@ document.addEventListener('DOMContentLoaded', function() {
             uploadRevenueData(file);
         })
         .catch(error => console.error('Failed to load revenue sample data:', error));
+    
+    // Set up date filter listeners
+    setupDateFilters();
 });
+
+// Set up date filter event listeners
+function setupDateFilters() {
+    // Occupancy filter
+    document.getElementById('occupancy-apply-filter').addEventListener('click', function() {
+        const startDate = document.getElementById('occupancy-start-date').value;
+        const endDate = document.getElementById('occupancy-end-date').value;
+        
+        if (startDate && endDate) {
+            currentFilters.occupancy = { startDate, endDate };
+            // Reload occupancy data with filters
+            fetch('/example_data_occupancy.csv')
+                .then(response => response.blob())
+                .then(blob => {
+                    const file = new File([blob], 'example_data_occupancy.csv', { type: 'text/csv' });
+                    uploadOccupancyData(file, startDate, endDate);
+                })
+                .catch(error => console.error('Failed to apply filter:', error));
+        }
+    });
+    
+    // Staffing filter
+    document.getElementById('staffing-apply-filter').addEventListener('click', function() {
+        const startDate = document.getElementById('staffing-start-date').value;
+        const endDate = document.getElementById('staffing-end-date').value;
+        
+        if (startDate && endDate) {
+            currentFilters.staffing = { startDate, endDate };
+            // Reload staffing data with filters
+            fetch('/example_data_staffing.csv')
+                .then(response => response.blob())
+                .then(blob => {
+                    const file = new File([blob], 'example_data_staffing.csv', { type: 'text/csv' });
+                    uploadStaffingData(file, startDate, endDate);
+                })
+                .catch(error => console.error('Failed to apply filter:', error));
+        }
+    });
+    
+    // Revenue filter
+    document.getElementById('revenue-apply-filter').addEventListener('click', function() {
+        const startDate = document.getElementById('revenue-start-date').value;
+        const endDate = document.getElementById('revenue-end-date').value;
+        
+        if (startDate && endDate) {
+            currentFilters.revenue = { startDate, endDate };
+            // Reload revenue data with filters
+            fetch('/example_data_revenue.csv')
+                .then(response => response.blob())
+                .then(blob => {
+                    const file = new File([blob], 'example_data_revenue.csv', { type: 'text/csv' });
+                    uploadRevenueData(file, startDate, endDate);
+                })
+                .catch(error => console.error('Failed to apply filter:', error));
+        }
+    });
+    
+    // Cashflow filter
+    document.getElementById('cashflow-apply-filter').addEventListener('click', function() {
+        const startDate = document.getElementById('cashflow-start-date').value;
+        const endDate = document.getElementById('cashflow-end-date').value;
+        
+        if (startDate && endDate) {
+            currentFilters.cashflow = { startDate, endDate };
+            // Trigger cashflow analysis with filters
+            analyzeCashflowWithFilters(startDate, endDate);
+        }
+    });
+}
 
 // ========================
 // TAB 1: OCCUPANCY RATE
 // ========================
 
-function uploadOccupancyData(file) {
+function uploadOccupancyData(file, startDate = null, endDate = null) {
     const formData = new FormData();
     formData.append('file', file);
+    if (startDate) formData.append('start_date', startDate);
+    if (endDate) formData.append('end_date', endDate);
     
     document.getElementById('occupancy-loading').classList.add('active');
     document.getElementById('occupancy-results').style.display = 'none';
@@ -62,6 +144,16 @@ function uploadOccupancyData(file) {
         if (data.error) {
             alert('Error: ' + data.error);
             return;
+        }
+        
+        // Set date range defaults if available
+        if (data.min_date && data.max_date) {
+            document.getElementById('occupancy-start-date').value = data.min_date;
+            document.getElementById('occupancy-end-date').value = data.max_date;
+            document.getElementById('occupancy-start-date').setAttribute('min', data.min_date);
+            document.getElementById('occupancy-start-date').setAttribute('max', data.max_date);
+            document.getElementById('occupancy-end-date').setAttribute('min', data.min_date);
+            document.getElementById('occupancy-end-date').setAttribute('max', data.max_date);
         }
         
         // Update metrics
@@ -218,9 +310,11 @@ document.getElementById('predict-occupancy-btn').addEventListener('click', funct
 // TAB 2: STAFFING COSTS
 // ========================
 
-function uploadStaffingData(file) {
+function uploadStaffingData(file, startDate = null, endDate = null) {
     const formData = new FormData();
     formData.append('file', file);
+    if (startDate) formData.append('start_date', startDate);
+    if (endDate) formData.append('end_date', endDate);
     
     document.getElementById('staffing-loading').classList.add('active');
     document.getElementById('staffing-results').style.display = 'none';
@@ -236,6 +330,16 @@ function uploadStaffingData(file) {
         if (data.error) {
             alert('Error: ' + data.error);
             return;
+        }
+        
+        // Set date range defaults if available
+        if (data.min_date && data.max_date) {
+            document.getElementById('staffing-start-date').value = data.min_date;
+            document.getElementById('staffing-end-date').value = data.max_date;
+            document.getElementById('staffing-start-date').setAttribute('min', data.min_date);
+            document.getElementById('staffing-start-date').setAttribute('max', data.max_date);
+            document.getElementById('staffing-end-date').setAttribute('min', data.min_date);
+            document.getElementById('staffing-end-date').setAttribute('max', data.max_date);
         }
         
         // Update metrics
@@ -387,9 +491,11 @@ document.getElementById('predict-staffing-btn').addEventListener('click', functi
 // TAB 3: REVENUE & CASH FLOW
 // ========================
 
-function uploadRevenueData(file) {
+function uploadRevenueData(file, startDate = null, endDate = null) {
     const formData = new FormData();
     formData.append('file', file);
+    if (startDate) formData.append('start_date', startDate);
+    if (endDate) formData.append('end_date', endDate);
     
     document.getElementById('revenue-loading').classList.add('active');
     document.getElementById('revenue-results').style.display = 'none';
@@ -405,6 +511,16 @@ function uploadRevenueData(file) {
         if (data.error) {
             alert('Error: ' + data.error);
             return;
+        }
+        
+        // Set date range defaults if available
+        if (data.min_date && data.max_date) {
+            document.getElementById('revenue-start-date').value = data.min_date;
+            document.getElementById('revenue-end-date').value = data.max_date;
+            document.getElementById('revenue-start-date').setAttribute('min', data.min_date);
+            document.getElementById('revenue-start-date').setAttribute('max', data.max_date);
+            document.getElementById('revenue-end-date').setAttribute('min', data.min_date);
+            document.getElementById('revenue-end-date').setAttribute('max', data.max_date);
         }
         
         // Update metrics
@@ -564,6 +680,56 @@ document.getElementById('predict-revenue-btn').addEventListener('click', functio
 // ========================
 // TAB 4: CASH FLOW
 // ========================
+
+function analyzeCashflowWithFilters(startDate = null, endDate = null) {
+    const formData = new FormData();
+    if (startDate) formData.append('start_date', startDate);
+    if (endDate) formData.append('end_date', endDate);
+    
+    fetch('/analyze_cashflow', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert('Error: ' + data.error);
+            return;
+        }
+        
+        // Update metrics
+        document.getElementById('net-cashflow').textContent = formatCurrency(data.net_cashflow);
+        document.getElementById('burn-rate').textContent = formatCurrency(data.burn_rate);
+        document.getElementById('profit-margin').textContent = data.profit_margin.toFixed(2) + '%';
+        
+        // Render cash flow trend chart
+        if (data.cashflow_trend) {
+            Plotly.newPlot('cashflow-trend-chart', data.cashflow_trend.data, data.cashflow_trend.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
+        }
+        
+        // Render cumulative cash flow chart
+        if (data.cumulative_chart) {
+            Plotly.newPlot('cumulative-cashflow-chart', data.cumulative_chart.data, data.cumulative_chart.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
+        }
+        
+        // Render summary chart
+        if (data.summary_chart) {
+            Plotly.newPlot('summary-chart', data.summary_chart.data, data.summary_chart.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
+        }
+    })
+    .catch(error => {
+        alert('Analysis failed: ' + error);
+    });
+}
 
 document.getElementById('analyze-cashflow-btn').addEventListener('click', function() {
     this.disabled = true;

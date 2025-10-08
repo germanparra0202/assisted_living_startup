@@ -84,8 +84,19 @@ def upload_occupancy():
             else:
                 df = pd.read_excel(filepath)
             
+            # Apply date filter if provided
+            start_date = request.form.get('start_date')
+            end_date = request.form.get('end_date')
+            if start_date and end_date and 'date' in df.columns:
+                df['date'] = pd.to_datetime(df['date'])
+                df = df[(df['date'] >= start_date) & (df['date'] <= end_date)]
+            
+            # Check if DataFrame is empty after filtering
+            if len(df) == 0:
+                return jsonify({'error': 'No data found in the selected date range'}), 400
+            
             # Basic statistics
-            total_beds = df['total_beds'].iloc[0] if 'total_beds' in df.columns else 100
+            total_beds = df['total_beds'].iloc[0] if 'total_beds' in df.columns and len(df) > 0 else 100
             
             # Calculate occupancy metrics
             if 'occupied_beds' in df.columns:
@@ -141,6 +152,14 @@ def upload_occupancy():
             else:
                 condition_chart = None
             
+            # Get min and max dates for filter defaults
+            min_date = None
+            max_date = None
+            if 'date' in df.columns:
+                df['date'] = pd.to_datetime(df['date'])
+                min_date = df['date'].min().strftime('%Y-%m-%d')
+                max_date = df['date'].max().strftime('%Y-%m-%d')
+            
             return jsonify({
                 'success': True,
                 'occupancy_rate': round(occupancy_rate, 2),
@@ -148,7 +167,9 @@ def upload_occupancy():
                 'occupied_beds': avg_occupied_beds,
                 'trend_chart': trend_chart,
                 'condition_chart': condition_chart,
-                'data_preview': df.head(10).to_dict('records')
+                'data_preview': df.head(10).to_dict('records'),
+                'min_date': min_date,
+                'max_date': max_date
             })
         
         return jsonify({'error': 'Invalid file type'}), 400
@@ -247,6 +268,17 @@ def upload_staffing():
             else:
                 df = pd.read_excel(filepath)
             
+            # Apply date filter if provided
+            start_date = request.form.get('start_date')
+            end_date = request.form.get('end_date')
+            if start_date and end_date and 'date' in df.columns:
+                df['date'] = pd.to_datetime(df['date'])
+                df = df[(df['date'] >= start_date) & (df['date'] <= end_date)]
+            
+            # Check if DataFrame is empty after filtering
+            if len(df) == 0:
+                return jsonify({'error': 'No data found in the selected date range'}), 400
+            
             # Calculate metrics
             total_cost = df['total_cost'].sum() if 'total_cost' in df.columns else 0
             avg_hourly_rate = df['hourly_rate'].mean() if 'hourly_rate' in df.columns else 0
@@ -293,6 +325,14 @@ def upload_staffing():
             else:
                 care_level_chart = None
             
+            # Get min and max dates for filter defaults
+            min_date = None
+            max_date = None
+            if 'date' in df.columns:
+                df['date'] = pd.to_datetime(df['date'])
+                min_date = df['date'].min().strftime('%Y-%m-%d')
+                max_date = df['date'].max().strftime('%Y-%m-%d')
+            
             return jsonify({
                 'success': True,
                 'total_cost': round(total_cost, 2),
@@ -300,7 +340,9 @@ def upload_staffing():
                 'total_staff': int(total_staff),
                 'cost_trend_chart': cost_trend_chart,
                 'care_level_chart': care_level_chart,
-                'data_preview': df.head(10).to_dict('records')
+                'data_preview': df.head(10).to_dict('records'),
+                'min_date': min_date,
+                'max_date': max_date
             })
         
         return jsonify({'error': 'Invalid file type'}), 400
@@ -397,6 +439,17 @@ def upload_revenue():
             else:
                 df = pd.read_excel(filepath)
             
+            # Apply date filter if provided
+            start_date = request.form.get('start_date')
+            end_date = request.form.get('end_date')
+            if start_date and end_date and 'date' in df.columns:
+                df['date'] = pd.to_datetime(df['date'])
+                df = df[(df['date'] >= start_date) & (df['date'] <= end_date)]
+            
+            # Check if DataFrame is empty after filtering
+            if len(df) == 0:
+                return jsonify({'error': 'No data found in the selected date range'}), 400
+            
             # Calculate metrics
             total_revenue = df['amount'].sum() if 'amount' in df.columns else 0
             avg_revenue = df['amount'].mean() if 'amount' in df.columns else 0
@@ -442,13 +495,23 @@ def upload_revenue():
             else:
                 revenue_trend_chart = None
             
+            # Get min and max dates for filter defaults
+            min_date = None
+            max_date = None
+            if 'date' in df.columns:
+                df['date'] = pd.to_datetime(df['date'])
+                min_date = df['date'].min().strftime('%Y-%m-%d')
+                max_date = df['date'].max().strftime('%Y-%m-%d')
+            
             return jsonify({
                 'success': True,
                 'total_revenue': round(total_revenue, 2),
                 'avg_revenue': round(avg_revenue, 2),
                 'payer_chart': payer_chart,
                 'revenue_trend_chart': revenue_trend_chart,
-                'data_preview': df.head(10).to_dict('records')
+                'data_preview': df.head(10).to_dict('records'),
+                'min_date': min_date,
+                'max_date': max_date
             })
         
         return jsonify({'error': 'Invalid file type'}), 400
@@ -776,6 +839,17 @@ def analyze_cashflow():
         # Process dates
         revenue_df['date'] = pd.to_datetime(revenue_df['date'])
         staffing_df['date'] = pd.to_datetime(staffing_df['date'])
+        
+        # Apply date filter if provided
+        start_date = request.form.get('start_date')
+        end_date = request.form.get('end_date')
+        if start_date and end_date:
+            revenue_df = revenue_df[(revenue_df['date'] >= start_date) & (revenue_df['date'] <= end_date)]
+            staffing_df = staffing_df[(staffing_df['date'] >= start_date) & (staffing_df['date'] <= end_date)]
+        
+        # Check if DataFrames are empty after filtering
+        if len(revenue_df) == 0 or len(staffing_df) == 0:
+            return jsonify({'error': 'No data found in the selected date range for one or both data sources'}), 400
         
         # Calculate daily totals
         daily_revenue = revenue_df.groupby('date')['amount'].sum().reset_index()

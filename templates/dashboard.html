@@ -372,6 +372,28 @@
                         <p class="mb-0 small">Viewing analytics based on sample occupancy data. To upload your own data or download templates, visit the <a href="/uploads">Uploads page</a>.</p>
                     </div>
                     
+                    <!-- Date Filter -->
+                    <div class="card mb-4" style="border-radius: 12px; border: 1px solid #e0e0e0;">
+                        <div class="card-body">
+                            <h6 class="mb-3"><i class="fas fa-calendar-alt me-2"></i>Date Range Filter</h6>
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-4">
+                                    <label class="form-label small">Start Date</label>
+                                    <input type="date" class="form-control" id="occupancy-start-date">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small">End Date</label>
+                                    <input type="date" class="form-control" id="occupancy-end-date">
+                                </div>
+                                <div class="col-md-4">
+                                    <button class="btn btn-analyze w-100" id="occupancy-apply-filter">
+                                        <i class="fas fa-filter me-2"></i>Apply Filter
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- Loading Spinner -->
                     <div class="loading-spinner" id="occupancy-loading">
                         <div class="spinner-border text-primary" role="status">
@@ -453,6 +475,28 @@
                     <div class="alert alert-custom alert-info mb-4">
                         <h6><i class="fas fa-info-circle me-2"></i>Sample Data Loaded</h6>
                         <p class="mb-0 small">Viewing analytics based on sample staffing data. To upload your own data or download templates, visit the <a href="/uploads">Uploads page</a>.</p>
+                    </div>
+                    
+                    <!-- Date Filter -->
+                    <div class="card mb-4" style="border-radius: 12px; border: 1px solid #e0e0e0;">
+                        <div class="card-body">
+                            <h6 class="mb-3"><i class="fas fa-calendar-alt me-2"></i>Date Range Filter</h6>
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-4">
+                                    <label class="form-label small">Start Date</label>
+                                    <input type="date" class="form-control" id="staffing-start-date">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small">End Date</label>
+                                    <input type="date" class="form-control" id="staffing-end-date">
+                                </div>
+                                <div class="col-md-4">
+                                    <button class="btn btn-analyze w-100" id="staffing-apply-filter">
+                                        <i class="fas fa-filter me-2"></i>Apply Filter
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="loading-spinner" id="staffing-loading">
@@ -537,6 +581,28 @@
                         <p class="mb-0 small">Viewing analytics based on sample revenue data. To upload your own data or download templates, visit the <a href="/uploads">Uploads page</a>.</p>
                     </div>
                     
+                    <!-- Date Filter -->
+                    <div class="card mb-4" style="border-radius: 12px; border: 1px solid #e0e0e0;">
+                        <div class="card-body">
+                            <h6 class="mb-3"><i class="fas fa-calendar-alt me-2"></i>Date Range Filter</h6>
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-4">
+                                    <label class="form-label small">Start Date</label>
+                                    <input type="date" class="form-control" id="revenue-start-date">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small">End Date</label>
+                                    <input type="date" class="form-control" id="revenue-end-date">
+                                </div>
+                                <div class="col-md-4">
+                                    <button class="btn btn-analyze w-100" id="revenue-apply-filter">
+                                        <i class="fas fa-filter me-2"></i>Apply Filter
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="loading-spinner" id="revenue-loading">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>
@@ -611,6 +677,28 @@
                     <div class="alert alert-custom alert-info mb-4">
                         <h6><i class="fas fa-info-circle me-2"></i>Data Source</h6>
                         <p class="mb-0 small">Cash Flow combines data from Revenue and Staffing uploads. Make sure both datasets are uploaded in the <a href="/uploads">Uploads page</a>.</p>
+                    </div>
+                    
+                    <!-- Date Filter -->
+                    <div class="card mb-4" style="border-radius: 12px; border: 1px solid #e0e0e0;">
+                        <div class="card-body">
+                            <h6 class="mb-3"><i class="fas fa-calendar-alt me-2"></i>Date Range Filter</h6>
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-4">
+                                    <label class="form-label small">Start Date</label>
+                                    <input type="date" class="form-control" id="cashflow-start-date">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small">End Date</label>
+                                    <input type="date" class="form-control" id="cashflow-end-date">
+                                </div>
+                                <div class="col-md-4">
+                                    <button class="btn btn-analyze w-100" id="cashflow-apply-filter">
+                                        <i class="fas fa-filter me-2"></i>Apply Filter
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
                     <div id="cashflow-results" class="results-section">
