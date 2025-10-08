@@ -206,3 +206,42 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Project-specific files
+# Uploaded data files (keep example files)
+uploads/
+*.csv
+*.xlsx
+*.xls
+!example_data_*.csv
+!example_data_*.xlsx
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# OS-specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp

@@ -170,7 +170,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('home') }}">
+            <a class="navbar-brand" href="{{ url_for('dashboard') }}">
                 <i class="fas fa-heart me-2"></i>CareConnect
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -179,19 +179,9 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('home') }}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('services') }}">Services</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('about') }}">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('contact') }}">Contact</a>
-                    </li>
-                    <li class="nav-item ms-2">
-                        <a class="btn btn-primary" href="{{ url_for('contact') }}">Get Started</a>
+                        <span class="nav-link text-muted">
+                            <i class="fas fa-chart-bar me-2"></i>Analytics Platform
+                        </span>
                     </li>
                 </ul>
             </div>
@@ -229,10 +219,10 @@
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h5>Company</h5>
                     <ul class="list-unstyled">
-                        <li><a href="{{ url_for('about') }}">About Us</a></li>
+                        <li><a href="#">About Us</a></li>
                         <li><a href="#">Careers</a></li>
                         <li><a href="#">News</a></li>
-                        <li><a href="{{ url_for('contact') }}">Contact</a></li>
+                        <li><a href="#">Contact</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-4 mb-4">

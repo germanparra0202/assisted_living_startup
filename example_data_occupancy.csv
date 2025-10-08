@@ -1,0 +1,25 @@
+date,occupancy_rate,total_beds,occupied_beds,condition,age,condition_severity,stay_duration
+2024-01-01,85.5,100,86,Dementia,78,3,180
+2024-01-15,87.2,100,87,Alzheimer's,82,4,240
+2024-02-01,88.0,100,88,Physical Disability,75,2,120
+2024-02-15,86.5,100,87,Dementia,80,3,200
+2024-03-01,89.0,100,89,Heart Disease,77,3,150
+2024-03-15,90.5,100,91,Alzheimer's,85,5,300
+2024-04-01,88.5,100,89,Physical Disability,72,2,90
+2024-04-15,87.0,100,87,Dementia,79,3,180
+2024-05-01,91.0,100,91,Stroke Recovery,81,4,210
+2024-05-15,92.5,100,93,Alzheimer's,84,4,260
+2024-06-01,90.0,100,90,Dementia,76,3,170
+2024-06-15,89.5,100,90,Heart Disease,78,3,190
+2024-07-01,93.0,100,93,Physical Disability,74,2,110
+2024-07-15,91.5,100,92,Alzheimer's,83,4,240
+2024-08-01,92.0,100,92,Dementia,80,3,200
+2024-08-15,90.5,100,91,Stroke Recovery,79,4,220
+2024-09-01,94.0,100,94,Alzheimer's,86,5,280
+2024-09-15,93.5,100,94,Physical Disability,73,2,100
+2024-10-01,95.0,100,95,Dementia,81,3,210
+2024-10-15,94.5,100,95,Heart Disease,77,3,180
+2024-11-01,96.0,100,96,Alzheimer's,85,4,250
+2024-11-15,95.5,100,96,Dementia,82,3,230
+2024-12-01,97.0,100,97,Physical Disability,75,2,130
+2024-12-15,96.5,100,97,Stroke Recovery,80,4,200

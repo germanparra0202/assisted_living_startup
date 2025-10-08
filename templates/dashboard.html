@@ -1,0 +1,649 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics Dashboard - CareConnect{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 4rem 0 3rem;
+        margin-bottom: 0;
+    }
+    
+    .dashboard-container {
+        background: #f8f9fa;
+        min-height: calc(100vh - 80px);
+        padding: 0 0 3rem 0;
+    }
+    
+    .dashboard-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        padding: 0;
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+    
+    .nav-tabs {
+        border: none;
+        background: #f8f9fa;
+        padding: 1rem 1.5rem 0 1.5rem;
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .nav-tabs .nav-link {
+        border: none;
+        background: transparent;
+        color: #6c757d;
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+        border-radius: 12px 12px 0 0;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .nav-tabs .nav-link:hover {
+        background: rgba(255, 255, 255, 0.5);
+        color: #667eea;
+    }
+    
+    .nav-tabs .nav-link.active {
+        background: white;
+        color: #667eea;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .tab-content {
+        background: white;
+        padding: 2.5rem;
+    }
+    
+    .section-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .section-header h4 {
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .section-header p {
+        color: #6c757d;
+        margin: 0;
+    }
+    
+    .upload-zone {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: 2px dashed #cbd5e0;
+        border-radius: 16px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+    }
+    
+    .upload-zone:hover {
+        border-color: #667eea;
+        background: linear-gradient(135deg, #f0f4ff 0%, #e6eeff 100%);
+    }
+    
+    .upload-zone.dragover {
+        border-color: #667eea;
+        background: linear-gradient(135deg, #e6eeff 0%, #dce7ff 100%);
+        transform: scale(1.02);
+    }
+    
+    .upload-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+    }
+    
+    .metric-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 16px;
+        padding: 1.75rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.25);
+        transition: transform 0.3s ease;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .metric-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin: 0.5rem 0;
+        line-height: 1;
+    }
+    
+    .metric-label {
+        font-size: 0.875rem;
+        opacity: 0.9;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .metric-icon {
+        font-size: 1.5rem;
+        opacity: 0.8;
+    }
+    
+    .btn-analyze {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 0.875rem 2.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-analyze:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+    }
+    
+    .btn-analyze:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    
+    .chart-container {
+        background: #f8f9fa;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .loading-spinner {
+        display: none;
+        text-align: center;
+        padding: 3rem;
+    }
+    
+    .loading-spinner.active {
+        display: block;
+    }
+    
+    .spinner-border {
+        width: 3rem;
+        height: 3rem;
+        border-width: 0.3rem;
+    }
+    
+    .alert-custom {
+        border-radius: 12px;
+        border: none;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .alert-info {
+        background: linear-gradient(135deg, #e6f2ff 0%, #d9ebff 100%);
+        color: #004085;
+    }
+    
+    .results-section {
+        animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .file-input-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .file-input-wrapper input[type="file"] {
+        display: none;
+    }
+    
+    .file-input-label {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.875rem 2rem;
+        border-radius: 12px;
+        cursor: pointer;
+        display: inline-block;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .file-input-label:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 1.5rem 0;
+    }
+    
+    .feature-list li {
+        padding: 0.75rem 0;
+        display: flex;
+        align-items: center;
+        color: #4a5568;
+    }
+    
+    .feature-list li i {
+        color: #667eea;
+        margin-right: 0.75rem;
+        font-size: 1.1rem;
+    }
+    
+    .info-box {
+        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        border-left: 4px solid #667eea;
+        padding: 1.25rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+    
+    .info-box h6 {
+        color: #667eea;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .info-box p {
+        margin: 0;
+        color: #4a5568;
+        font-size: 0.9rem;
+    }
+</style>
+
+<!-- Dashboard Hero -->
+<div class="dashboard-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-5 fw-bold mb-3">Analytics Dashboard</h1>
+                <p class="lead mb-0">Comprehensive data analytics and forecasting for assisted living operations. Upload your data to generate insights, visualizations, and AI-powered predictions.</p>
+            </div>
+            <div class="col-lg-4 text-end">
+                <div class="d-flex flex-column gap-2">
+                    <div class="d-flex align-items-center justify-content-end gap-3">
+                        <i class="fas fa-chart-line fa-2x"></i>
+                        <div class="text-end">
+                            <div class="h6 mb-0">Real-time Analytics</div>
+                            <small class="opacity-75">Instant Insights</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-container">
+    <div class="container">
+        <div class="dashboard-card mt-4">
+            <!-- Tabs Navigation -->
+            <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="occupancy-tab" data-bs-toggle="tab" data-bs-target="#occupancy" type="button" role="tab">
+                        <i class="fas fa-bed"></i>
+                        <span>Occupancy Analytics</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="staffing-tab" data-bs-toggle="tab" data-bs-target="#staffing" type="button" role="tab">
+                        <i class="fas fa-users"></i>
+                        <span>Staffing Analytics</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="revenue-tab" data-bs-toggle="tab" data-bs-target="#revenue" type="button" role="tab">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span>Revenue Analytics</span>
+                    </button>
+                </li>
+            </ul>
+            
+            <!-- Tabs Content -->
+            <div class="tab-content" id="dashboardTabsContent">
+                <!-- TAB 1: Occupancy Rate -->
+                <div class="tab-pane fade show active" id="occupancy" role="tabpanel">
+                    <div class="section-header">
+                        <h4><i class="fas fa-bed text-primary me-2"></i>Occupancy Rate Analysis</h4>
+                        <p>Analyze facility occupancy, patient demographics, and predict life expectancy using machine learning models.</p>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-lg-8">
+                            <div class="upload-zone" id="occupancy-upload-area">
+                                <div class="upload-icon">
+                                    <i class="fas fa-file-csv"></i>
+                                </div>
+                                <h5 class="mb-2">Upload Occupancy Data</h5>
+                                <p class="text-muted mb-3">Drag and drop your file here or click to browse</p>
+                                <div class="file-input-wrapper">
+                                    <input type="file" id="occupancy-file" accept=".csv,.xlsx,.xls" />
+                                    <label for="occupancy-file" class="file-input-label">
+                                        <i class="fas fa-folder-open me-2"></i>Choose File
+                                    </label>
+                                </div>
+                                <div class="mt-3 text-muted small" id="occupancy-filename"></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="info-box">
+                                <h6><i class="fas fa-info-circle me-2"></i>Required Columns</h6>
+                                <p class="small mb-2">Your data should include:</p>
+                                <ul class="feature-list small">
+                                    <li><i class="fas fa-check-circle"></i> date, occupancy_rate</li>
+                                    <li><i class="fas fa-check-circle"></i> total_beds, occupied_beds</li>
+                                    <li><i class="fas fa-check-circle"></i> condition, age</li>
+                                    <li><i class="fas fa-check-circle"></i> condition_severity, stay_duration</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Loading Spinner -->
+                    <div class="loading-spinner" id="occupancy-loading">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3 text-muted">Analyzing your data...</p>
+                    </div>
+                    
+                    <!-- Results Section -->
+                    <div id="occupancy-results" class="results-section" style="display: none;">
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="metric-card">
+                                    <div class="metric-icon"><i class="fas fa-percentage"></i></div>
+                                    <div class="metric-label">Current Occupancy</div>
+                                    <div class="metric-value" id="occupancy-rate">0%</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="metric-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                    <div class="metric-icon"><i class="fas fa-hospital"></i></div>
+                                    <div class="metric-label">Total Capacity</div>
+                                    <div class="metric-value" id="total-beds">0</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="metric-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                    <div class="metric-icon"><i class="fas fa-users"></i></div>
+                                    <div class="metric-label">Occupied Beds</div>
+                                    <div class="metric-value" id="occupied-beds">0</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <div id="occupancy-trend-chart"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <div id="condition-chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mb-4">
+                            <button class="btn btn-analyze" id="predict-occupancy-btn">
+                                <i class="fas fa-brain me-2"></i>Generate AI Predictions
+                            </button>
+                        </div>
+                        
+                        <div id="occupancy-prediction-results" style="display: none;">
+                            <div class="alert alert-custom alert-info">
+                                <h5><i class="fas fa-chart-line me-2"></i>Prediction Insights</h5>
+                                <p class="mb-0">Average Predicted Life Expectancy: <strong id="avg-life-expectancy">0</strong> years</p>
+                            </div>
+                            <div class="chart-container">
+                                <div id="prediction-chart"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- TAB 2: Staffing Costs -->
+                <div class="tab-pane fade" id="staffing" role="tabpanel">
+                    <div class="section-header">
+                        <h4><i class="fas fa-users text-primary me-2"></i>Staffing Cost Analysis</h4>
+                        <p>Track staffing expenses, analyze care levels, and forecast future costs with predictive models.</p>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-lg-8">
+                            <div class="upload-zone" id="staffing-upload-area">
+                                <div class="upload-icon">
+                                    <i class="fas fa-file-excel"></i>
+                                </div>
+                                <h5 class="mb-2">Upload Staffing Data</h5>
+                                <p class="text-muted mb-3">Drag and drop your file here or click to browse</p>
+                                <div class="file-input-wrapper">
+                                    <input type="file" id="staffing-file" accept=".csv,.xlsx,.xls" />
+                                    <label for="staffing-file" class="file-input-label">
+                                        <i class="fas fa-folder-open me-2"></i>Choose File
+                                    </label>
+                                </div>
+                                <div class="mt-3 text-muted small" id="staffing-filename"></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="info-box">
+                                <h6><i class="fas fa-info-circle me-2"></i>Required Columns</h6>
+                                <p class="small mb-2">Your data should include:</p>
+                                <ul class="feature-list small">
+                                    <li><i class="fas fa-check-circle"></i> date, total_cost</li>
+                                    <li><i class="fas fa-check-circle"></i> hourly_rate</li>
+                                    <li><i class="fas fa-check-circle"></i> staff_count</li>
+                                    <li><i class="fas fa-check-circle"></i> care_level</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="loading-spinner" id="staffing-loading">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3 text-muted">Analyzing your data...</p>
+                    </div>
+                    
+                    <div id="staffing-results" class="results-section" style="display: none;">
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="metric-card">
+                                    <div class="metric-icon"><i class="fas fa-dollar-sign"></i></div>
+                                    <div class="metric-label">Total Costs</div>
+                                    <div class="metric-value" id="total-cost">$0</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="metric-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                    <div class="metric-icon"><i class="fas fa-clock"></i></div>
+                                    <div class="metric-label">Avg Hourly Rate</div>
+                                    <div class="metric-value" id="avg-hourly-rate">$0</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="metric-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                    <div class="metric-icon"><i class="fas fa-user-nurse"></i></div>
+                                    <div class="metric-label">Staff Count</div>
+                                    <div class="metric-value" id="total-staff">0</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <div id="cost-trend-chart"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <div id="care-level-chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mb-4">
+                            <button class="btn btn-analyze" id="predict-staffing-btn">
+                                <i class="fas fa-brain me-2"></i>Generate Cost Forecast
+                            </button>
+                        </div>
+                        
+                        <div id="staffing-prediction-results" style="display: none;">
+                            <div class="alert alert-custom alert-info">
+                                <h5><i class="fas fa-chart-line me-2"></i>Forecast Results</h5>
+                                <p class="mb-1">Next Month Projection: <strong id="next-month-cost">$0</strong></p>
+                                <p class="mb-0">6-Month Total: <strong id="six-month-total">$0</strong></p>
+                            </div>
+                            <div class="chart-container">
+                                <div id="staffing-forecast-chart"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- TAB 3: Revenue & Cash Flow -->
+                <div class="tab-pane fade" id="revenue" role="tabpanel">
+                    <div class="section-header">
+                        <h4><i class="fas fa-dollar-sign text-primary me-2"></i>Revenue & Cash Flow Analysis</h4>
+                        <p>Analyze revenue streams, payer mix distribution, and forecast future cash flow patterns.</p>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-lg-8">
+                            <div class="upload-zone" id="revenue-upload-area">
+                                <div class="upload-icon">
+                                    <i class="fas fa-file-invoice-dollar"></i>
+                                </div>
+                                <h5 class="mb-2">Upload Revenue Data</h5>
+                                <p class="text-muted mb-3">Drag and drop your file here or click to browse</p>
+                                <div class="file-input-wrapper">
+                                    <input type="file" id="revenue-file" accept=".csv,.xlsx,.xls" />
+                                    <label for="revenue-file" class="file-input-label">
+                                        <i class="fas fa-folder-open me-2"></i>Choose File
+                                    </label>
+                                </div>
+                                <div class="mt-3 text-muted small" id="revenue-filename"></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="info-box">
+                                <h6><i class="fas fa-info-circle me-2"></i>Required Columns</h6>
+                                <p class="small mb-2">Your data should include:</p>
+                                <ul class="feature-list small">
+                                    <li><i class="fas fa-check-circle"></i> date, amount</li>
+                                    <li><i class="fas fa-check-circle"></i> payer_type</li>
+                                    <li><i class="fas fa-check-circle"></i> payment_delay_days</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="loading-spinner" id="revenue-loading">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3 text-muted">Analyzing your data...</p>
+                    </div>
+                    
+                    <div id="revenue-results" class="results-section" style="display: none;">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="metric-card">
+                                    <div class="metric-icon"><i class="fas fa-money-bill-wave"></i></div>
+                                    <div class="metric-label">Total Revenue</div>
+                                    <div class="metric-value" id="total-revenue">$0</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="metric-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                    <div class="metric-icon"><i class="fas fa-chart-bar"></i></div>
+                                    <div class="metric-label">Average Revenue</div>
+                                    <div class="metric-value" id="avg-revenue">$0</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <div id="payer-chart"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <div id="revenue-trend-chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mb-4">
+                            <button class="btn btn-analyze" id="predict-revenue-btn">
+                                <i class="fas fa-brain me-2"></i>Generate Revenue Forecast
+                            </button>
+                        </div>
+                        
+                        <div id="revenue-prediction-results" style="display: none;">
+                            <div class="alert alert-custom alert-info">
+                                <h5><i class="fas fa-chart-line me-2"></i>Forecast Insights</h5>
+                                <p class="mb-1">Next Month Projection: <strong id="next-month-revenue">$0</strong></p>
+                                <p class="mb-1">6-Month Total: <strong id="six-month-revenue">$0</strong></p>
+                                <p class="mb-0">Avg Payment Delay: <strong id="avg-delay">0</strong> days</p>
+                            </div>
+                            <div class="chart-container">
+                                <div id="revenue-forecast-chart"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Plotly.js -->
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}
