@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+
+{% block title %}Data Uploads - CareConnect Analytics{% endblock %}
+
+{% block content %}
+<style>
+    .uploads-hero {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        color: white;
+        padding: 4rem 0 3rem;
+        margin-bottom: 0;
+    }
+    
+    .upload-container {
+        background: #f8f9fa;
+        min-height: calc(100vh - 200px);
+        padding: 3rem 0;
+    }
+    
+    .upload-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .upload-zone {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: 2px dashed #cbd5e0;
+        border-radius: 16px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .upload-zone:hover {
+        border-color: #2c3e50;
+        background: linear-gradient(135deg, #f0f4ff 0%, #e6eeff 100%);
+    }
+    
+    .upload-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1rem;
+        background: linear-gradient(135deg, #343a40 0%, #495057 100%);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+    }
+    
+    .file-input-label {
+        background: linear-gradient(135deg, #343a40 0%, #495057 100%);
+        color: white;
+        padding: 0.875rem 2rem;
+        border-radius: 12px;
+        cursor: pointer;
+        display: inline-block;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .file-input-label:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .success-message {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+        display: none;
+    }
+    
+    .success-message.show {
+        display: block;
+        animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<!-- Hero Section -->
+<div class="uploads-hero">
+    <div class="container">
+        <h1 class="display-5 fw-bold mb-3">
+            <i class="fas fa-upload me-3"></i>Data Uploads
+        </h1>
+        <p class="lead mb-0">Upload your data files here to enable analytics across all dashboard tabs</p>
+    </div>
+</div>
+
+<div class="upload-container">
+    <div class="container">
+        <!-- Occupancy Data Upload -->
+        <div class="upload-card">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h3 class="mb-3"><i class="fas fa-bed text-primary me-2"></i>Occupancy Data</h3>
+                    <div class="upload-zone" id="occupancy-upload-area">
+                        <div class="upload-icon">
+                            <i class="fas fa-file-csv"></i>
+                        </div>
+                        <h5 class="mb-2">Upload Occupancy Data</h5>
+                        <p class="text-muted mb-3">Drag and drop your file here or click to browse</p>
+                        <button class="btn btn-sm btn-outline-secondary mb-3" id="load-sample-occupancy-btn">
+                            <i class="fas fa-database me-2"></i>Load 100-Row Sample Data
+                        </button>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="occupancy-file" accept=".csv,.xlsx,.xls" style="display: none;" />
+                            <label for="occupancy-file" class="file-input-label">
+                                <i class="fas fa-folder-open me-2"></i>Choose File
+                            </label>
+                        </div>
+                        <div class="mt-3 text-muted small" id="occupancy-filename"></div>
+                    </div>
+                    <div class="success-message" id="occupancy-success">
+                        <i class="fas fa-check-circle me-2"></i>Data uploaded successfully! Go to Dashboard to view analytics.
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <h6><i class="fas fa-download me-2"></i>Download Template</h6>
+                    <p class="small mb-3">Get a pre-formatted CSV template with all required columns</p>
+                    <a href="/template_occupancy.csv" download class="btn btn-sm btn-outline-primary w-100 mb-3">
+                        <i class="fas fa-file-csv me-2"></i>Download Template
+                    </a>
+                    <h6 class="mt-3"><i class="fas fa-table me-2"></i>Data Structure</h6>
+                    <div class="table-responsive" style="font-size: 0.8rem;">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>date</td><td>Date</td><td>2024-01-01</td></tr>
+                                <tr><td>occupancy_rate</td><td>Number</td><td>85.5</td></tr>
+                                <tr><td>total_beds</td><td>Integer</td><td>100</td></tr>
+                                <tr><td>occupied_beds</td><td>Integer</td><td>85</td></tr>
+                                <tr><td>condition</td><td>Text</td><td>Dementia</td></tr>
+                                <tr><td>age</td><td>Integer</td><td>78</td></tr>
+                                <tr><td>condition_severity</td><td>Integer (1-5)</td><td>3</td></tr>
+                                <tr><td>stay_duration</td><td>Integer (days)</td><td>45</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Staffing Data Upload -->
+        <div class="upload-card">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h3 class="mb-3"><i class="fas fa-users text-primary me-2"></i>Staffing Data</h3>
+                    <div class="upload-zone" id="staffing-upload-area">
+                        <div class="upload-icon">
+                            <i class="fas fa-file-excel"></i>
+                        </div>
+                        <h5 class="mb-2">Upload Staffing Data</h5>
+                        <p class="text-muted mb-3">Drag and drop your file here or click to browse</p>
+                        <button class="btn btn-sm btn-outline-secondary mb-3" id="load-sample-staffing-btn">
+                            <i class="fas fa-database me-2"></i>Load 100-Row Sample Data
+                        </button>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="staffing-file" accept=".csv,.xlsx,.xls" style="display: none;" />
+                            <label for="staffing-file" class="file-input-label">
+                                <i class="fas fa-folder-open me-2"></i>Choose File
+                            </label>
+                        </div>
+                        <div class="mt-3 text-muted small" id="staffing-filename"></div>
+                    </div>
+                    <div class="success-message" id="staffing-success">
+                        <i class="fas fa-check-circle me-2"></i>Data uploaded successfully! Go to Dashboard to view analytics.
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <h6><i class="fas fa-download me-2"></i>Download Template</h6>
+                    <p class="small mb-3">Get a pre-formatted CSV template with all required columns</p>
+                    <a href="/template_staffing.csv" download class="btn btn-sm btn-outline-primary w-100 mb-3">
+                        <i class="fas fa-file-csv me-2"></i>Download Template
+                    </a>
+                    <h6 class="mt-3"><i class="fas fa-table me-2"></i>Data Structure</h6>
+                    <div class="table-responsive" style="font-size: 0.8rem;">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>date</td><td>Date</td><td>2024-01-01</td></tr>
+                                <tr><td>total_cost</td><td>Number</td><td>5000</td></tr>
+                                <tr><td>hourly_rate</td><td>Number</td><td>25.50</td></tr>
+                                <tr><td>staff_count</td><td>Integer</td><td>15</td></tr>
+                                <tr><td>care_level</td><td>Text</td><td>Basic/Advanced</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Revenue Data Upload -->
+        <div class="upload-card">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h3 class="mb-3"><i class="fas fa-dollar-sign text-primary me-2"></i>Revenue Data</h3>
+                    <div class="upload-zone" id="revenue-upload-area">
+                        <div class="upload-icon">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        </div>
+                        <h5 class="mb-2">Upload Revenue Data</h5>
+                        <p class="text-muted mb-3">Drag and drop your file here or click to browse</p>
+                        <button class="btn btn-sm btn-outline-secondary mb-3" id="load-sample-revenue-btn">
+                            <i class="fas fa-database me-2"></i>Load 100-Row Sample Data
+                        </button>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="revenue-file" accept=".csv,.xlsx,.xls" style="display: none;" />
+                            <label for="revenue-file" class="file-input-label">
+                                <i class="fas fa-folder-open me-2"></i>Choose File
+                            </label>
+                        </div>
+                        <div class="mt-3 text-muted small" id="revenue-filename"></div>
+                    </div>
+                    <div class="success-message" id="revenue-success">
+                        <i class="fas fa-check-circle me-2"></i>Data uploaded successfully! Go to Dashboard to view analytics.
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <h6><i class="fas fa-download me-2"></i>Download Template</h6>
+                    <p class="small mb-3">Get a pre-formatted CSV template with all required columns</p>
+                    <a href="/template_revenue.csv" download class="btn btn-sm btn-outline-primary w-100 mb-3">
+                        <i class="fas fa-file-csv me-2"></i>Download Template
+                    </a>
+                    <h6 class="mt-3"><i class="fas fa-table me-2"></i>Data Structure</h6>
+                    <div class="table-responsive" style="font-size: 0.8rem;">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>date</td><td>Date</td><td>2024-01-01</td></tr>
+                                <tr><td>amount</td><td>Number</td><td>3500</td></tr>
+                                <tr><td>payer_type</td><td>Text</td><td>Private Pay/Medicare/Insurance</td></tr>
+                                <tr><td>payment_delay_days</td><td>Integer</td><td>30</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="text-center mt-4">
+            <a href="/dashboard" class="btn btn-lg" style="background: linear-gradient(135deg, #343a40 0%, #495057 100%); color: white; padding: 1rem 3rem; border-radius: 12px; font-weight: 600;">
+                <i class="fas fa-chart-line me-2"></i>Go to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script>
+// Override success behavior to show message instead of displaying results
+function showSuccessMessage(type) {
+    document.getElementById(type + '-success').classList.add('show');
+    setTimeout(() => {
+        document.getElementById(type + '-success').classList.remove('show');
+    }, 5000);
+}
+
+// Override uploadOccupancyData to show success message
+const originalUploadOccupancy = uploadOccupancyData;
+uploadOccupancyData = function(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    fetch('/upload_occupancy', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert('Error: ' + data.error);
+        } else {
+            showSuccessMessage('occupancy');
+        }
+    })
+    .catch(error => alert('Upload failed: ' + error));
+};
+
+// Override uploadStaffingData to show success message
+const originalUploadStaffing = uploadStaffingData;
+uploadStaffingData = function(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    fetch('/upload_staffing', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert('Error: ' + data.error);
+        } else {
+            showSuccessMessage('staffing');
+        }
+    })
+    .catch(error => alert('Upload failed: ' + error));
+};
+
+// Override uploadRevenueData to show success message
+const originalUploadRevenue = uploadRevenueData;
+uploadRevenueData = function(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    fetch('/upload_revenue', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert('Error: ' + data.error);
+        } else {
+            showSuccessMessage('revenue');
+        }
+    })
+    .catch(error => alert('Upload failed: ' + error));
+};
+</script>
+{% endblock %}

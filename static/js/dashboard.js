@@ -10,75 +10,39 @@ function formatCurrency(value) {
     }).format(value);
 }
 
-// Sample data loading functions
-document.getElementById('load-sample-occupancy-btn').addEventListener('click', function() {
+// Auto-load sample data on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Load occupancy data automatically
     fetch('/example_data_occupancy.csv')
         .then(response => response.blob())
         .then(blob => {
             const file = new File([blob], 'example_data_occupancy.csv', { type: 'text/csv' });
-            document.getElementById('occupancy-filename').textContent = 'Loaded: 100-row sample data';
             uploadOccupancyData(file);
         })
-        .catch(error => alert('Failed to load sample data: ' + error));
-});
-
-document.getElementById('load-sample-staffing-btn').addEventListener('click', function() {
+        .catch(error => console.error('Failed to load occupancy sample data:', error));
+    
+    // Load staffing data automatically
     fetch('/example_data_staffing.csv')
         .then(response => response.blob())
         .then(blob => {
             const file = new File([blob], 'example_data_staffing.csv', { type: 'text/csv' });
-            document.getElementById('staffing-filename').textContent = 'Loaded: 100-row sample data';
             uploadStaffingData(file);
         })
-        .catch(error => alert('Failed to load sample data: ' + error));
-});
-
-document.getElementById('load-sample-revenue-btn').addEventListener('click', function() {
+        .catch(error => console.error('Failed to load staffing sample data:', error));
+    
+    // Load revenue data automatically
     fetch('/example_data_revenue.csv')
         .then(response => response.blob())
         .then(blob => {
             const file = new File([blob], 'example_data_revenue.csv', { type: 'text/csv' });
-            document.getElementById('revenue-filename').textContent = 'Loaded: 100-row sample data';
             uploadRevenueData(file);
         })
-        .catch(error => alert('Failed to load sample data: ' + error));
+        .catch(error => console.error('Failed to load revenue sample data:', error));
 });
 
 // ========================
 // TAB 1: OCCUPANCY RATE
 // ========================
-
-const occupancyFileInput = document.getElementById('occupancy-file');
-const occupancyUploadArea = document.getElementById('occupancy-upload-area');
-
-occupancyFileInput.addEventListener('change', function(e) {
-    if (this.files.length > 0) {
-        document.getElementById('occupancy-filename').textContent = `Selected: ${this.files[0].name}`;
-        uploadOccupancyData(this.files[0]);
-    }
-});
-
-// Drag and drop support
-occupancyUploadArea.addEventListener('dragover', function(e) {
-    e.preventDefault();
-    this.classList.add('dragover');
-});
-
-occupancyUploadArea.addEventListener('dragleave', function(e) {
-    e.preventDefault();
-    this.classList.remove('dragover');
-});
-
-occupancyUploadArea.addEventListener('drop', function(e) {
-    e.preventDefault();
-    this.classList.remove('dragover');
-    const file = e.dataTransfer.files[0];
-    if (file) {
-        occupancyFileInput.files = e.dataTransfer.files;
-        document.getElementById('occupancy-filename').textContent = `Selected: ${file.name}`;
-        uploadOccupancyData(file);
-    }
-});
 
 function uploadOccupancyData(file) {
     const formData = new FormData();
@@ -254,37 +218,6 @@ document.getElementById('predict-occupancy-btn').addEventListener('click', funct
 // TAB 2: STAFFING COSTS
 // ========================
 
-const staffingFileInput = document.getElementById('staffing-file');
-const staffingUploadArea = document.getElementById('staffing-upload-area');
-
-staffingFileInput.addEventListener('change', function(e) {
-    if (this.files.length > 0) {
-        document.getElementById('staffing-filename').textContent = `Selected: ${this.files[0].name}`;
-        uploadStaffingData(this.files[0]);
-    }
-});
-
-staffingUploadArea.addEventListener('dragover', function(e) {
-    e.preventDefault();
-    this.classList.add('dragover');
-});
-
-staffingUploadArea.addEventListener('dragleave', function(e) {
-    e.preventDefault();
-    this.classList.remove('dragover');
-});
-
-staffingUploadArea.addEventListener('drop', function(e) {
-    e.preventDefault();
-    this.classList.remove('dragover');
-    const file = e.dataTransfer.files[0];
-    if (file) {
-        staffingFileInput.files = e.dataTransfer.files;
-        document.getElementById('staffing-filename').textContent = `Selected: ${file.name}`;
-        uploadStaffingData(file);
-    }
-});
-
 function uploadStaffingData(file) {
     const formData = new FormData();
     formData.append('file', file);
@@ -453,37 +386,6 @@ document.getElementById('predict-staffing-btn').addEventListener('click', functi
 // ========================
 // TAB 3: REVENUE & CASH FLOW
 // ========================
-
-const revenueFileInput = document.getElementById('revenue-file');
-const revenueUploadArea = document.getElementById('revenue-upload-area');
-
-revenueFileInput.addEventListener('change', function(e) {
-    if (this.files.length > 0) {
-        document.getElementById('revenue-filename').textContent = `Selected: ${this.files[0].name}`;
-        uploadRevenueData(this.files[0]);
-    }
-});
-
-revenueUploadArea.addEventListener('dragover', function(e) {
-    e.preventDefault();
-    this.classList.add('dragover');
-});
-
-revenueUploadArea.addEventListener('dragleave', function(e) {
-    e.preventDefault();
-    this.classList.remove('dragover');
-});
-
-revenueUploadArea.addEventListener('drop', function(e) {
-    e.preventDefault();
-    this.classList.remove('dragover');
-    const file = e.dataTransfer.files[0];
-    if (file) {
-        revenueFileInput.files = e.dataTransfer.files;
-        document.getElementById('revenue-filename').textContent = `Selected: ${file.name}`;
-        uploadRevenueData(file);
-    }
-});
 
 function uploadRevenueData(file) {
     const formData = new FormData();
@@ -656,5 +558,62 @@ document.getElementById('predict-revenue-btn').addEventListener('click', functio
         this.disabled = false;
         this.innerHTML = '<i class="fas fa-chart-line me-2"></i>Generate Revenue Forecast';
         alert('Prediction failed: ' + error);
+    });
+});
+
+// ========================
+// TAB 4: CASH FLOW
+// ========================
+
+document.getElementById('analyze-cashflow-btn').addEventListener('click', function() {
+    this.disabled = true;
+    this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing Cash Flow...';
+    
+    fetch('/analyze_cashflow', {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        this.disabled = false;
+        this.innerHTML = '<i class="fas fa-calculator me-2"></i>Run Cash Flow Analysis';
+        
+        if (data.error) {
+            alert('Error: ' + data.error);
+            return;
+        }
+        
+        // Update metrics
+        document.getElementById('net-cashflow').textContent = formatCurrency(data.net_cashflow);
+        document.getElementById('burn-rate').textContent = formatCurrency(data.burn_rate);
+        document.getElementById('profit-margin').textContent = data.profit_margin.toFixed(2) + '%';
+        
+        // Render cash flow trend chart
+        if (data.cashflow_trend) {
+            Plotly.newPlot('cashflow-trend-chart', data.cashflow_trend.data, data.cashflow_trend.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
+        }
+        
+        // Render cumulative cash flow chart
+        if (data.cumulative_chart) {
+            Plotly.newPlot('cumulative-cashflow-chart', data.cumulative_chart.data, data.cumulative_chart.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
+        }
+        
+        // Render summary chart
+        if (data.summary_chart) {
+            Plotly.newPlot('summary-chart', data.summary_chart.data, data.summary_chart.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
+        }
+    })
+    .catch(error => {
+        this.disabled = false;
+        this.innerHTML = '<i class="fas fa-calculator me-2"></i>Run Cash Flow Analysis';
+        alert('Analysis failed: ' + error);
     });
 });

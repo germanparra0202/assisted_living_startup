@@ -22,6 +22,10 @@ def allowed_file(filename):
 def home():
     return render_template('home.html')
 
+@app.route('/uploads')
+def uploads():
+    return render_template('uploads.html')
+
 @app.route('/dashboard')
 def dashboard():
     return render_template('dashboard.html')
@@ -741,6 +745,135 @@ def analyze_revenue_stats():
             'total_records': len(df)
         })
     
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# TAB 4: Cash Flow Routes
+@app.route('/analyze_cashflow', methods=['POST'])
+def analyze_cashflow():
+    try:
+        # Find revenue and staffing files
+        revenue_files = [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if f.startswith('revenue_')]
+        staffing_files = [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if f.startswith('staffing_')]
+        
+        if not revenue_files or not staffing_files:
+            return jsonify({'error': 'Please upload both Revenue and Staffing data first'}), 400
+        
+        # Read the data
+        revenue_filepath = os.path.join(app.config['UPLOAD_FOLDER'], revenue_files[0])
+        staffing_filepath = os.path.join(app.config['UPLOAD_FOLDER'], staffing_files[0])
+        
+        if revenue_filepath.endswith('.csv'):
+            revenue_df = pd.read_csv(revenue_filepath)
+        else:
+            revenue_df = pd.read_excel(revenue_filepath)
+            
+        if staffing_filepath.endswith('.csv'):
+            staffing_df = pd.read_csv(staffing_filepath)
+        else:
+            staffing_df = pd.read_excel(staffing_filepath)
+        
+        # Process dates
+        revenue_df['date'] = pd.to_datetime(revenue_df['date'])
+        staffing_df['date'] = pd.to_datetime(staffing_df['date'])
+        
+        # Calculate daily totals
+        daily_revenue = revenue_df.groupby('date')['amount'].sum().reset_index()
+        daily_revenue.columns = ['date', 'revenue']
+        
+        daily_costs = staffing_df.groupby('date')['total_cost'].sum().reset_index()
+        daily_costs.columns = ['date', 'costs']
+        
+        # Merge data
+        cashflow_df = pd.merge(daily_revenue, daily_costs, on='date', how='outer').fillna(0)
+        cashflow_df = cashflow_df.sort_values('date')
+        cashflow_df['net_cashflow'] = cashflow_df['revenue'] - cashflow_df['costs']
+        cashflow_df['cumulative_cashflow'] = cashflow_df['net_cashflow'].cumsum()
+        
+        # Calculate metrics
+        total_revenue = cashflow_df['revenue'].sum()
+        total_costs = cashflow_df['costs'].sum()
+        net_cashflow = total_revenue - total_costs
+        avg_daily_burn = cashflow_df['costs'].mean()
+        profit_margin = (net_cashflow / total_revenue * 100) if total_revenue > 0 else 0
+        
+        # Create cash flow trend chart
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=cashflow_df['date'],
+            y=cashflow_df['revenue'],
+            mode='lines',
+            name='Revenue',
+            line=dict(color='#0077BB', width=3)
+        ))
+        fig.add_trace(go.Scatter(
+            x=cashflow_df['date'],
+            y=cashflow_df['costs'],
+            mode='lines',
+            name='Costs',
+            line=dict(color='#EE7733', width=3)
+        ))
+        fig.add_trace(go.Scatter(
+            x=cashflow_df['date'],
+            y=cashflow_df['net_cashflow'],
+            mode='lines',
+            name='Net Cash Flow',
+            line=dict(color='#009988', width=3),
+            fill='tonexty'
+        ))
+        fig.update_layout(
+            title='Daily Cash Flow Analysis',
+            xaxis_title='Date',
+            yaxis_title='Amount ($)',
+            template='plotly_white',
+            hovermode='x unified'
+        )
+        cashflow_trend = json.loads(fig.to_json())
+        
+        # Create cumulative cash flow chart
+        fig2 = go.Figure()
+        fig2.add_trace(go.Scatter(
+            x=cashflow_df['date'],
+            y=cashflow_df['cumulative_cashflow'],
+            mode='lines+markers',
+            name='Cumulative Cash Flow',
+            line=dict(color='#009988', width=3),
+            fill='tozeroy'
+        ))
+        fig2.update_layout(
+            title='Cumulative Cash Flow Over Time',
+            xaxis_title='Date',
+            yaxis_title='Cumulative Amount ($)',
+            template='plotly_white'
+        )
+        cumulative_chart = json.loads(fig2.to_json())
+        
+        # Revenue vs Cost breakdown
+        fig3 = go.Figure(data=[
+            go.Bar(name='Revenue', x=['Total'], y=[total_revenue], marker_color='#0077BB'),
+            go.Bar(name='Costs', x=['Total'], y=[total_costs], marker_color='#EE7733'),
+            go.Bar(name='Net Profit', x=['Total'], y=[net_cashflow], marker_color='#009988')
+        ])
+        fig3.update_layout(
+            title='Revenue vs Costs Summary',
+            yaxis_title='Amount ($)',
+            template='plotly_white',
+            barmode='group'
+        )
+        summary_chart = json.loads(fig3.to_json())
+        
+        return jsonify({
+            'success': True,
+            'net_cashflow': round(net_cashflow, 2),
+            'burn_rate': round(avg_daily_burn, 2),
+            'profit_margin': round(profit_margin, 2),
+            'total_revenue': round(total_revenue, 2),
+            'total_costs': round(total_costs, 2),
+            'cashflow_trend': cashflow_trend,
+            'cumulative_chart': cumulative_chart,
+            'summary_chart': summary_chart
+        })
+        
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
