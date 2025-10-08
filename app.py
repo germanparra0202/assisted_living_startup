@@ -41,15 +41,18 @@ def serve_example_revenue():
 # Serve template files for download
 @app.route('/template_occupancy.csv')
 def serve_template_occupancy():
-    return app.send_static_file('../template_occupancy.csv')
+    from flask import send_file
+    return send_file('template_occupancy.csv', mimetype='text/csv', as_attachment=True, download_name='template_occupancy.csv')
 
 @app.route('/template_staffing.csv')
 def serve_template_staffing():
-    return app.send_static_file('../template_staffing.csv')
+    from flask import send_file
+    return send_file('template_staffing.csv', mimetype='text/csv', as_attachment=True, download_name='template_staffing.csv')
 
 @app.route('/template_revenue.csv')
 def serve_template_revenue():
-    return app.send_static_file('../template_revenue.csv')
+    from flask import send_file
+    return send_file('template_revenue.csv', mimetype='text/csv', as_attachment=True, download_name='template_revenue.csv')
 
 # TAB 1: Occupancy Rate Routes
 @app.route('/upload_occupancy', methods=['POST'])
@@ -75,8 +78,20 @@ def upload_occupancy():
             
             # Basic statistics
             total_beds = df['total_beds'].iloc[0] if 'total_beds' in df.columns else 100
-            occupied_beds = df['occupied_beds'].sum() if 'occupied_beds' in df.columns else df.shape[0]
-            occupancy_rate = (occupied_beds / total_beds) * 100 if total_beds > 0 else 0
+            
+            # Calculate occupancy metrics
+            if 'occupied_beds' in df.columns:
+                avg_occupied_beds = int(df['occupied_beds'].mean())
+            else:
+                avg_occupied_beds = 0
+            
+            # Calculate average occupancy rate
+            if 'occupancy_rate' in df.columns:
+                occupancy_rate = df['occupancy_rate'].mean()
+            elif 'occupied_beds' in df.columns and total_beds > 0:
+                occupancy_rate = (avg_occupied_beds / total_beds) * 100
+            else:
+                occupancy_rate = 0
             
             # Create occupancy trend chart
             if 'date' in df.columns and 'occupancy_rate' in df.columns:
@@ -122,7 +137,7 @@ def upload_occupancy():
                 'success': True,
                 'occupancy_rate': round(occupancy_rate, 2),
                 'total_beds': int(total_beds),
-                'occupied_beds': int(occupied_beds),
+                'occupied_beds': avg_occupied_beds,
                 'trend_chart': trend_chart,
                 'condition_chart': condition_chart,
                 'data_preview': df.head(10).to_dict('records')
@@ -722,6 +737,130 @@ def analyze_revenue_stats():
             'total_records': len(df)
         })
     
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# CSV Export Routes
+@app.route('/export_occupancy_analysis', methods=['GET'])
+def export_occupancy_analysis():
+    try:
+        from flask import send_file
+        import io
+        
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if f.startswith('occupancy_')][0])
+        
+        if filepath.endswith('.csv'):
+            df = pd.read_csv(filepath)
+        else:
+            df = pd.read_excel(filepath)
+        
+        # Add analysis results
+        if 'age' in df.columns and 'condition_severity' in df.columns and 'stay_duration' in df.columns:
+            X = df[['age', 'condition_severity', 'stay_duration']].dropna()
+            np.random.seed(42)
+            y = 85 - (X['age'] * 0.5) - (X['condition_severity'] * 2) + np.random.normal(0, 5, len(X))
+            y = np.clip(y, 1, 100)
+            model = LinearRegression()
+            model.fit(X, y)
+            df['predicted_life_expectancy'] = model.predict(X)
+        
+        # Create CSV output
+        output = io.StringIO()
+        df.to_csv(output, index=False)
+        output.seek(0)
+        
+        return send_file(
+            io.BytesIO(output.getvalue().encode()),
+            mimetype='text/csv',
+            as_attachment=True,
+            download_name='occupancy_analysis_results.csv'
+        )
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/export_staffing_analysis', methods=['GET'])
+def export_staffing_analysis():
+    try:
+        from flask import send_file
+        import io
+        
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if f.startswith('staffing_')][0])
+        
+        if filepath.endswith('.csv'):
+            df = pd.read_csv(filepath)
+        else:
+            df = pd.read_excel(filepath)
+        
+        # Add forecast if applicable
+        if 'date' in df.columns and 'total_cost' in df.columns:
+            df['date'] = pd.to_datetime(df['date'])
+            df = df.sort_values('date')
+            df['days'] = (df['date'] - df['date'].min()).dt.days
+            
+            model = LinearRegression()
+            model.fit(df[['days']].values, df['total_cost'].values)
+            
+            # Add 6-month forecast
+            last_day = df['days'].max()
+            future_days = [[last_day + i * 30] for i in range(1, 7)]
+            future_costs = model.predict(future_days)
+            
+            forecast_df = pd.DataFrame({
+                'date': [df['date'].max() + pd.Timedelta(days=i * 30) for i in range(1, 7)],
+                'total_cost': future_costs,
+                'type': 'forecast'
+            })
+            
+            df['type'] = 'historical'
+            df = pd.concat([df[['date', 'total_cost', 'type']], forecast_df], ignore_index=True)
+        
+        # Create CSV output
+        output = io.StringIO()
+        df.to_csv(output, index=False)
+        output.seek(0)
+        
+        return send_file(
+            io.BytesIO(output.getvalue().encode()),
+            mimetype='text/csv',
+            as_attachment=True,
+            download_name='staffing_analysis_results.csv'
+        )
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/export_revenue_analysis', methods=['GET'])
+def export_revenue_analysis():
+    try:
+        from flask import send_file
+        import io
+        
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if f.startswith('revenue_')][0])
+        
+        if filepath.endswith('.csv'):
+            df = pd.read_csv(filepath)
+        else:
+            df = pd.read_excel(filepath)
+        
+        # Add analysis columns
+        if 'date' in df.columns and 'amount' in df.columns:
+            df['date'] = pd.to_datetime(df['date'])
+            daily_revenue = df.groupby('date')['amount'].sum().reset_index()
+            daily_revenue['cumulative_revenue'] = daily_revenue['amount'].cumsum()
+            
+            # Merge back
+            df = df.merge(daily_revenue[['date', 'cumulative_revenue']], on='date', how='left')
+        
+        # Create CSV output
+        output = io.StringIO()
+        df.to_csv(output, index=False)
+        output.seek(0)
+        
+        return send_file(
+            io.BytesIO(output.getvalue().encode()),
+            mimetype='text/csv',
+            as_attachment=True,
+            download_name='revenue_analysis_results.csv'
+        )
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
