@@ -1179,3 +1179,114 @@ document.getElementById('analyze-cashflow-btn').addEventListener('click', functi
         alert('Analysis failed: ' + error);
     });
 });
+
+// ========================
+// OCCUPANCY RECOMMENDATIONS
+// ========================
+
+document.getElementById('generate-recommendations-btn').addEventListener('click', function() {
+    this.disabled = true;
+    this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating Recommendations...';
+    
+    // Show loading, hide content
+    document.getElementById('recommendations-loading').style.display = 'block';
+    document.getElementById('recommendations-content').style.display = 'none';
+    
+    fetch('/generate_occupancy_recommendations', {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        this.disabled = false;
+        this.innerHTML = '<i class="fas fa-magic me-2"></i>Generate Smart Recommendations';
+        
+        document.getElementById('recommendations-loading').style.display = 'none';
+        
+        if (data.error) {
+            alert('Error: ' + data.error);
+            return;
+        }
+        
+        // Build recommendations HTML
+        let recsHTML = '<div class="row mb-4">';
+        recsHTML += `<div class="col-md-12">
+            <div class="alert alert-info">
+                <h5><i class="fas fa-info-circle me-2"></i>Recommendation Summary</h5>
+                <p class="mb-0">Generated <strong>${data.summary.total_recommendations}</strong> recommendations: 
+                <span class="badge bg-danger">${data.summary.high_priority} High Priority</span>
+                <span class="badge bg-warning text-dark">${data.summary.medium_priority} Medium Priority</span>
+                <span class="badge bg-secondary">${data.summary.low_priority} Low Priority</span>
+                </p>
+            </div>
+        </div></div>`;
+        
+        // Display each recommendation
+        data.recommendations.forEach((rec, index) => {
+            const priorityColors = {
+                'high': 'danger',
+                'medium': 'warning',
+                'low': 'secondary'
+            };
+            const priorityColor = priorityColors[rec.priority];
+            const priorityIcon = rec.priority === 'high' ? 'exclamation-circle' : 
+                                rec.priority === 'medium' ? 'exclamation-triangle' : 'info-circle';
+            
+            recsHTML += `
+                <div class="card mb-3" style="border-left: 4px solid var(--bs-${priorityColor}); border-radius: 12px;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h5 class="card-title mb-1">
+                                    <i class="fas fa-${priorityIcon} text-${priorityColor} me-2"></i>${rec.title}
+                                </h5>
+                                <span class="badge bg-${priorityColor} me-2">${rec.priority.toUpperCase()} PRIORITY</span>
+                                <span class="badge bg-secondary">${rec.category}</span>
+                            </div>
+                        </div>
+                        <p class="card-text text-muted mb-3">${rec.description}</p>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <h6 class="text-muted mb-2"><i class="fas fa-chart-bar me-2"></i>Key Metrics</h6>
+                                <div class="row">`;
+            
+            for (const [key, value] of Object.entries(rec.metrics)) {
+                recsHTML += `
+                    <div class="col-md-4 mb-2">
+                        <div class="p-2" style="background: #f8f9fa; border-radius: 8px;">
+                            <small class="text-muted d-block">${key}</small>
+                            <strong>${value}</strong>
+                        </div>
+                    </div>`;
+            }
+            
+            recsHTML += `
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h6 class="text-muted mb-2"><i class="fas fa-tasks me-2"></i>Recommended Actions</h6>
+                            <ul class="mb-0">`;
+            
+            rec.actions.forEach(action => {
+                recsHTML += `<li>${action}</li>`;
+            });
+            
+            recsHTML += `
+                            </ul>
+                        </div>
+                    </div>
+                </div>`;
+        });
+        
+        document.getElementById('recommendations-content').innerHTML = recsHTML;
+        document.getElementById('recommendations-content').style.display = 'block';
+    })
+    .catch(error => {
+        this.disabled = false;
+        this.innerHTML = '<i class="fas fa-magic me-2"></i>Generate Smart Recommendations';
+        document.getElementById('recommendations-loading').style.display = 'none';
+        alert('Failed to generate recommendations: ' + error);
+    });
+});

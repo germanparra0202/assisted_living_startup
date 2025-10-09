@@ -145,7 +145,10 @@ def upload_occupancy():
                     xaxis_title='Date',
                     yaxis_title='Occupancy Rate (%)',
                     template='plotly_white',
-                    hovermode='x unified'
+                    hovermode='x unified',
+                    autosize=True,
+                    height=300,
+                    margin=dict(t=40, b=40, l=50, r=20)
                 )
                 trend_chart = json.loads(fig.to_json())
             else:
@@ -163,7 +166,9 @@ def upload_occupancy():
                     title='Patient Condition Distribution',
                     xaxis_title='Condition',
                     yaxis_title='Count',
-                    template='plotly_white'
+                    template='plotly_white',
+                    height=300,
+                    margin=dict(t=40, b=40, l=50, r=20)
                 )
                 condition_chart = json.loads(fig2.to_json())
             else:
@@ -180,15 +185,18 @@ def upload_occupancy():
                 fig3 = go.Figure(data=[go.Pie(
                     labels=['Occupied', 'Vacant', 'Pending', 'Moving Out'],
                     values=[avg_occupied, avg_vacant, avg_pending, avg_moving_out],
-                    hole=0.4,
+                    hole=0.3,
                     marker=dict(colors=['#0077BB', '#EE7733', '#009988', '#CC3311']),
-                    textinfo='label+value+percent',
-                    textfont_size=12
+                    textinfo='label+percent',
+                    textfont_size=11
                 )])
                 fig3.update_layout(
-                    title='Bed Status Breakdown (All Categories)',
+                    title={'text': 'Bed Status Breakdown', 'font': {'size': 12}},
                     template='plotly_white',
-                    showlegend=True
+                    showlegend=True,
+                    height=250,
+                    width=350,
+                    margin=dict(t=30, b=10, l=10, r=10)
                 )
                 bed_status_chart = json.loads(fig3.to_json())
             
@@ -230,12 +238,15 @@ def upload_occupancy():
                 ))
                 
                 fig4.update_layout(
-                    title='Unit Breakdown - Beds by Category',
+                    title={'text': 'Unit Breakdown', 'font': {'size': 13}},
                     xaxis_title='Unit',
-                    yaxis_title='Average Bed Count',
+                    yaxis_title='Avg Beds',
                     barmode='group',
                     template='plotly_white',
-                    showlegend=True
+                    showlegend=True,
+                    height=280,
+                    margin=dict(t=35, b=35, l=35, r=15),
+                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, font=dict(size=10))
                 )
                 unit_breakdown_chart = json.loads(fig4.to_json())
             
@@ -251,15 +262,19 @@ def upload_occupancy():
                     y=daily_potential['potential_clients'],
                     mode='lines+markers',
                     name='Potential Clients',
-                    line=dict(color='#009988', width=3),
-                    fill='tozeroy'
+                    line=dict(color='#009988', width=2),
+                    fill='tozeroy',
+                    marker=dict(size=4)
                 ))
                 fig5.update_layout(
-                    title='Potential Clients Trend',
+                    title={'text': 'Potential Clients', 'font': {'size': 13}},
                     xaxis_title='Date',
-                    yaxis_title='Number of Potential Clients',
+                    yaxis_title='Count',
                     template='plotly_white',
-                    hovermode='x unified'
+                    hovermode='x unified',
+                    height=280,
+                    margin=dict(t=35, b=35, l=35, r=15),
+                    showlegend=False
                 )
                 potential_clients_chart = json.loads(fig5.to_json())
             
@@ -399,9 +414,16 @@ def upload_staffing():
             avg_hourly_rate = df['hourly_rate'].mean() if 'hourly_rate' in df.columns else 0
             total_staff = df['staff_count'].sum() if 'staff_count' in df.columns else len(df)
             
+            # Get min and max dates for filter defaults
+            min_date = None
+            max_date = None
+            if 'date' in df.columns:
+                df['date'] = pd.to_datetime(df['date'])
+                min_date = df['date'].min().strftime('%Y-%m-%d')
+                max_date = df['date'].max().strftime('%Y-%m-%d')
+            
             # Create cost trend chart
             if 'date' in df.columns and 'total_cost' in df.columns:
-                df['date'] = pd.to_datetime(df['date'])
                 fig = go.Figure()
                 fig.add_trace(go.Scatter(
                     x=df['date'],
@@ -416,7 +438,9 @@ def upload_staffing():
                     xaxis_title='Date',
                     yaxis_title='Total Cost ($)',
                     template='plotly_white',
-                    hovermode='x unified'
+                    hovermode='x unified',
+                    height=300,
+                    margin=dict(t=40, b=40, l=50, r=20)
                 )
                 cost_trend_chart = json.loads(fig.to_json())
             else:
@@ -434,19 +458,13 @@ def upload_staffing():
                     title='Cost by Care Level',
                     xaxis_title='Care Level',
                     yaxis_title='Total Cost ($)',
-                    template='plotly_white'
+                    template='plotly_white',
+                    height=300,
+                    margin=dict(t=40, b=40, l=50, r=20)
                 )
                 care_level_chart = json.loads(fig2.to_json())
             else:
                 care_level_chart = None
-            
-            # Get min and max dates for filter defaults
-            min_date = None
-            max_date = None
-            if 'date' in df.columns:
-                df['date'] = pd.to_datetime(df['date'])
-                min_date = df['date'].min().strftime('%Y-%m-%d')
-                max_date = df['date'].max().strftime('%Y-%m-%d')
             
             response_data = {
                 'success': True,
@@ -1288,6 +1306,263 @@ def get_cashflow_by_date():
             }
             return jsonify(response_data)
             
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/generate_occupancy_recommendations', methods=['POST'])
+def generate_occupancy_recommendations():
+    try:
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if f.startswith('occupancy_')][0])
+        
+        if filepath.endswith('.csv'):
+            df = pd.read_csv(filepath)
+        else:
+            df = pd.read_excel(filepath)
+        
+        # Process dates
+        if 'date' in df.columns:
+            df['date'] = pd.to_datetime(df['date'])
+            df = df.sort_values('date')
+        
+        recommendations = []
+        
+        # 1. Occupancy Rate Analysis
+        if 'occupancy_rate' in df.columns:
+            avg_occupancy = df['occupancy_rate'].mean()
+            recent_occupancy = df.tail(7)['occupancy_rate'].mean()  # Last 7 days
+            
+            if avg_occupancy > 90:
+                recommendations.append({
+                    'category': 'Capacity Planning',
+                    'priority': 'high',
+                    'title': 'Near Full Capacity - Consider Expansion',
+                    'description': f'Average occupancy is {avg_occupancy:.1f}%, nearing full capacity. Consider planning for facility expansion or additional units.',
+                    'metrics': {
+                        'Current Occupancy': f'{avg_occupancy:.1f}%',
+                        'Recent Trend': f'{recent_occupancy:.1f}%'
+                    },
+                    'actions': [
+                        'Explore expansion opportunities',
+                        'Review wait-list management',
+                        'Increase marketing for premium units'
+                    ]
+                })
+            elif avg_occupancy < 70:
+                recommendations.append({
+                    'category': 'Marketing & Sales',
+                    'priority': 'high',
+                    'title': 'Low Occupancy - Increase Marketing Efforts',
+                    'description': f'Average occupancy is {avg_occupancy:.1f}%, below optimal levels. Focus on marketing and lead generation.',
+                    'metrics': {
+                        'Current Occupancy': f'{avg_occupancy:.1f}%',
+                        'Target Occupancy': '85-90%'
+                    },
+                    'actions': [
+                        'Launch targeted marketing campaigns',
+                        'Review pricing strategy',
+                        'Enhance community outreach',
+                        'Improve online presence'
+                    ]
+                })
+            else:
+                recommendations.append({
+                    'category': 'Operations',
+                    'priority': 'medium',
+                    'title': 'Healthy Occupancy Rate',
+                    'description': f'Occupancy rate of {avg_occupancy:.1f}% is within optimal range. Focus on maintaining quality of care.',
+                    'metrics': {
+                        'Current Occupancy': f'{avg_occupancy:.1f}%',
+                        'Status': 'Optimal'
+                    },
+                    'actions': [
+                        'Maintain current operations',
+                        'Focus on resident satisfaction',
+                        'Continue standard marketing efforts'
+                    ]
+                })
+        
+        # 2. Move-in/Move-out Trend Analysis
+        if all(col in df.columns for col in ['pending_beds', 'moving_out_beds']):
+            avg_pending = df['pending_beds'].mean()
+            avg_moving_out = df['moving_out_beds'].mean()
+            
+            if avg_pending > avg_moving_out * 1.5:
+                recommendations.append({
+                    'category': 'Staffing',
+                    'priority': 'high',
+                    'title': 'High Move-in Volume - Increase Staffing',
+                    'description': f'Pending admissions ({avg_pending:.1f}) significantly exceed move-outs ({avg_moving_out:.1f}). Prepare for increased staffing needs.',
+                    'metrics': {
+                        'Avg Pending Admissions': f'{avg_pending:.1f}',
+                        'Avg Move-outs': f'{avg_moving_out:.1f}',
+                        'Net Change': f'+{avg_pending - avg_moving_out:.1f}'
+                    },
+                    'actions': [
+                        'Recruit additional nursing staff',
+                        'Schedule more orientation sessions',
+                        'Prepare onboarding materials',
+                        'Review care staff ratios'
+                    ]
+                })
+            elif avg_moving_out > avg_pending * 1.5:
+                recommendations.append({
+                    'category': 'Revenue & Marketing',
+                    'priority': 'high',
+                    'title': 'High Move-out Rate - Fill Vacant Beds',
+                    'description': f'Move-outs ({avg_moving_out:.1f}) exceed pending admissions ({avg_pending:.1f}). Accelerate lead generation.',
+                    'metrics': {
+                        'Avg Move-outs': f'{avg_moving_out:.1f}',
+                        'Avg Pending': f'{avg_pending:.1f}',
+                        'Net Change': f'-{avg_moving_out - avg_pending:.1f}'
+                    },
+                    'actions': [
+                        'Intensify marketing campaigns',
+                        'Fast-track admission processes',
+                        'Offer move-in incentives',
+                        'Review resident satisfaction'
+                    ]
+                })
+        
+        # 3. Unit/Space Analysis
+        if 'vacant_beds' in df.columns and 'total_beds' in df.columns:
+            avg_vacant = df['vacant_beds'].mean()
+            total_beds = df['total_beds'].iloc[0] if len(df) > 0 else 100
+            vacancy_rate = (avg_vacant / total_beds) * 100
+            
+            if vacancy_rate > 20:
+                recommendations.append({
+                    'category': 'Space Optimization',
+                    'priority': 'medium',
+                    'title': 'High Vacancy - Optimize Space Utilization',
+                    'description': f'With {vacancy_rate:.1f}% vacancy rate, consider converting or repurposing unused space.',
+                    'metrics': {
+                        'Vacant Beds': f'{avg_vacant:.0f}',
+                        'Total Capacity': f'{total_beds}',
+                        'Vacancy Rate': f'{vacancy_rate:.1f}%'
+                    },
+                    'actions': [
+                        'Convert to specialized care units',
+                        'Create respite care options',
+                        'Offer short-term stay programs',
+                        'Develop memory care sections'
+                    ]
+                })
+        
+        # 4. Potential Clients Analysis
+        if 'potential_clients' in df.columns:
+            avg_potential = df['potential_clients'].mean()
+            recent_potential = df.tail(7)['potential_clients'].mean()
+            trend = 'increasing' if recent_potential > avg_potential else 'decreasing'
+            
+            if avg_potential > 10:
+                recommendations.append({
+                    'category': 'Sales Pipeline',
+                    'priority': 'high',
+                    'title': 'Strong Lead Pipeline - Accelerate Conversions',
+                    'description': f'Average of {avg_potential:.0f} potential clients with {trend} trend. Focus on conversion strategies.',
+                    'metrics': {
+                        'Avg Potential Clients': f'{avg_potential:.0f}',
+                        'Recent Average': f'{recent_potential:.0f}',
+                        'Trend': trend.title()
+                    },
+                    'actions': [
+                        'Expedite tour scheduling',
+                        'Enhance sales team capacity',
+                        'Streamline admission process',
+                        'Follow up on pending inquiries'
+                    ]
+                })
+            elif avg_potential < 5:
+                recommendations.append({
+                    'category': 'Lead Generation',
+                    'priority': 'high',
+                    'title': 'Low Lead Volume - Boost Marketing',
+                    'description': f'Only {avg_potential:.0f} potential clients on average. Urgent need to increase lead generation.',
+                    'metrics': {
+                        'Avg Potential Clients': f'{avg_potential:.0f}',
+                        'Target': '10-15',
+                        'Trend': trend.title()
+                    },
+                    'actions': [
+                        'Launch multi-channel marketing',
+                        'Partner with healthcare providers',
+                        'Attend community events',
+                        'Enhance digital advertising'
+                    ]
+                })
+        
+        # 5. Condition/Care Level Analysis
+        if 'condition_severity' in df.columns:
+            avg_severity = df['condition_severity'].mean()
+            high_severity_count = len(df[df['condition_severity'] >= 4])
+            total_count = len(df)
+            high_severity_pct = (high_severity_count / total_count) * 100 if total_count > 0 else 0
+            
+            if high_severity_pct > 40:
+                recommendations.append({
+                    'category': 'Staffing & Resources',
+                    'priority': 'high',
+                    'title': 'High Care Needs - Increase Specialized Staff',
+                    'description': f'{high_severity_pct:.1f}% of residents require high-severity care. Ensure adequate specialized staffing.',
+                    'metrics': {
+                        'High-Severity Residents': f'{high_severity_pct:.1f}%',
+                        'Avg Severity Score': f'{avg_severity:.1f}/5'
+                    },
+                    'actions': [
+                        'Hire specialized care nurses',
+                        'Provide advanced training',
+                        'Increase staff-to-resident ratios',
+                        'Add medical equipment/supplies'
+                    ]
+                })
+        
+        # 6. Occupancy Trend Projection
+        if 'date' in df.columns and 'occupancy_rate' in df.columns and len(df) >= 14:
+            # Calculate trend
+            df['days'] = (df['date'] - df['date'].min()).dt.days
+            from sklearn.linear_model import LinearRegression
+            model = LinearRegression()
+            model.fit(df[['days']].values, df['occupancy_rate'].values)
+            
+            # Project 30 days ahead
+            last_day = df['days'].max()
+            future_occupancy = model.predict([[last_day + 30]])[0]
+            trend_direction = 'increasing' if model.coef_[0] > 0 else 'decreasing'
+            
+            recommendations.append({
+                'category': 'Forecasting',
+                'priority': 'medium',
+                'title': f'Occupancy Trend: {trend_direction.title()}',
+                'description': f'Based on current trends, occupancy projected at {future_occupancy:.1f}% in 30 days.',
+                'metrics': {
+                    'Current Occupancy': f'{df["occupancy_rate"].iloc[-1]:.1f}%',
+                    '30-Day Projection': f'{future_occupancy:.1f}%',
+                    'Trend': trend_direction.title()
+                },
+                'actions': [
+                    'Monitor trend closely',
+                    'Adjust marketing budget accordingly',
+                    'Plan staffing levels proactively',
+                    'Review pricing strategy'
+                ]
+            })
+        
+        # Sort by priority
+        priority_order = {'high': 0, 'medium': 1, 'low': 2}
+        recommendations.sort(key=lambda x: priority_order[x['priority']])
+        
+        response_data = {
+            'success': True,
+            'recommendations': convert_to_serializable(recommendations),
+            'summary': {
+                'total_recommendations': len(recommendations),
+                'high_priority': len([r for r in recommendations if r['priority'] == 'high']),
+                'medium_priority': len([r for r in recommendations if r['priority'] == 'medium']),
+                'low_priority': len([r for r in recommendations if r['priority'] == 'low'])
+            }
+        }
+        return jsonify(response_data)
+        
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

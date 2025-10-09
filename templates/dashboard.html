@@ -158,7 +158,15 @@
     
     .chart-container > div {
         max-width: 100%;
-        overflow-x: auto;
+        overflow: hidden !important;
+    }
+    
+    .js-plotly-plot {
+        overflow: hidden !important;
+    }
+    
+    .js-plotly-plot .plotly {
+        overflow: hidden !important;
     }
     
     .loading-spinner {
@@ -314,6 +322,11 @@
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="occ-recommendations-tab" data-bs-toggle="pill" data-bs-target="#occ-recommendations" type="button" role="tab" style="margin-right: 0.5rem;">
+                                    <i class="fas fa-lightbulb me-2"></i>Recommendations
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="occ-analytics-tab" data-bs-toggle="pill" data-bs-target="#occ-analytics" type="button" role="tab">
                                     <i class="fas fa-brain me-2"></i>Analytics & Export
                                 </button>
@@ -323,7 +336,7 @@
                         <div class="tab-content" id="occupancy-subtabs-content">
                             <!-- Sub-tab 1: Overview -->
                             <div class="tab-pane fade show active" id="occ-overview" role="tabpanel">
-                                <div class="row mb-4">
+                                <div class="row mb-3">
                                     <div class="col-md-4">
                                         <div class="metric-card">
                                             <div class="metric-icon"><i class="fas fa-percentage"></i></div>
@@ -347,15 +360,15 @@
                                     </div>
                                 </div>
                                 
-                                <div class="row mb-4">
+                                <div class="row">
                                     <div class="col-md-6">
-                                        <div class="chart-container">
-                                            <div id="occupancy-trend-chart"></div>
+                                        <div class="chart-container" style="height: 350px;">
+                                            <div id="occupancy-trend-chart" style="height: 100%;"></div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="chart-container">
-                                            <div id="condition-chart"></div>
+                                        <div class="chart-container" style="height: 350px;">
+                                            <div id="condition-chart" style="height: 100%;"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -363,20 +376,20 @@
                             
                             <!-- Sub-tab 2: Bed Categories -->
                             <div class="tab-pane fade" id="occ-categories" role="tabpanel">
-                                <div class="row mb-4">
+                                <div class="row">
                                     <div class="col-md-4">
-                                        <div class="chart-container">
-                                            <div id="bed-status-chart"></div>
+                                        <div class="chart-container" style="height: 280px; padding: 0.75rem;">
+                                            <div id="bed-status-chart" style="height: 100%;"></div>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
-                                        <div class="chart-container">
-                                            <div id="unit-breakdown-chart"></div>
+                                        <div class="chart-container" style="height: 280px; padding: 0.75rem;">
+                                            <div id="unit-breakdown-chart" style="height: 100%;"></div>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
-                                        <div class="chart-container">
-                                            <div id="potential-clients-chart"></div>
+                                        <div class="chart-container" style="height: 280px; padding: 0.75rem;">
+                                            <div id="potential-clients-chart" style="height: 100%;"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -451,7 +464,27 @@
                                 </div>
                             </div>
                             
-                            <!-- Sub-tab 4: Analytics & Export -->
+                            <!-- Sub-tab 4: Recommendations -->
+                            <div class="tab-pane fade" id="occ-recommendations" role="tabpanel">
+                                <div class="text-center mb-4">
+                                    <button class="btn btn-analyze" id="generate-recommendations-btn">
+                                        <i class="fas fa-magic me-2"></i>Generate Smart Recommendations
+                                    </button>
+                                </div>
+                                
+                                <div id="recommendations-loading" style="display: none; text-align: center; padding: 2rem;">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="mt-3 text-muted">Analyzing occupancy trends...</p>
+                                </div>
+                                
+                                <div id="recommendations-content" style="display: none;">
+                                    <!-- Recommendations will be populated here -->
+                                </div>
+                            </div>
+                            
+                            <!-- Sub-tab 5: Analytics & Export -->
                             <div class="tab-pane fade" id="occ-analytics" role="tabpanel">
                                 <div class="text-center mb-4">
                                     <button class="btn btn-analyze me-2" id="predict-occupancy-btn">
